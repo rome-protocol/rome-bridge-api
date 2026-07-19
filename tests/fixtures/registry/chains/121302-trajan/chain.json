@@ -1,0 +1,18 @@
+{
+  "chainId": 121302,
+  "name": "Rome Trajan",
+  "network": "devnet",
+  "rpcUrl": "https://trajan.devnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-trajan.devnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Trajan",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "retired",
+  "romeEvmProgramId": "RPTWwELXAY4KC9ZPHhaxp7Sq1hHtU3HNEgLbSegCcWf",
+  "solana": {
+    "cluster": "devnet",
+    "rpc": "https://api.devnet.solana.com"
+  }
+}

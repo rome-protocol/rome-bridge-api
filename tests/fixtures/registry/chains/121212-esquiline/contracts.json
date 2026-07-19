@@ -1,0 +1,353 @@
+[
+  {
+    "name": "ERC20SPLFactory",
+    "versions": [
+      {
+        "address": "0xc2ac29f0a1fd0eaefe91ea1afe797e0ca599b5b1",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:19:20Z",
+        "sourceGitSha": "6229d00996f826fd3f1a86924e45716ba37034db",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "SPL_ERC20_USDC",
+    "versions": [
+      {
+        "address": "0x05663110cb16985b20783c71e788a19624cf3a8d",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:15:45Z",
+        "sourceGitSha": "6229d00996f826fd3f1a86924e45716ba37034db",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "SPL_ERC20_WETH",
+    "versions": [
+      {
+        "address": "0x38e4b1cd7c428e28b7ca8432c67133df6d70a55d",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:15:50Z",
+        "sourceGitSha": "6229d00996f826fd3f1a86924e45716ba37034db",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "SPL_ERC20_WSOL",
+    "versions": [
+      {
+        "address": "0xd538c2f1daf407acec5ee19dcd217b0b0ef22468",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:15:54Z",
+        "sourceGitSha": "6229d00996f826fd3f1a86924e45716ba37034db",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "RomeBridgeWithdraw",
+    "versions": [
+      {
+        "address": "0xd4ae59c90e47fa959b1c2aab32bdaaab3a826de8",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:16:07Z",
+        "sourceGitSha": "6229d00996f826fd3f1a86924e45716ba37034db",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "MeteoraDAMMv1Factory",
+    "versions": [
+      {
+        "address": "0x74fe3375df802c4b66e4648c452824bd806d8173",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:19:20Z",
+        "sourceGitSha": "6229d00996f826fd3f1a86924e45716ba37034db",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "SimpleActivator",
+    "versions": [
+      {
+        "address": "0x9506d6fac90475bf50940898b4f55fcd7202a65f",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:19:18Z",
+        "sourceGitSha": "6229d00996f826fd3f1a86924e45716ba37034db",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "WETH9",
+    "versions": [
+      {
+        "address": "0xa3611292fca6af83ba0eb98263c5673a953f2f30",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:18:44.077Z",
+        "sourceGitSha": "19829ea433d2f201d29b9389a9c0e0ea2ba5fad3",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "Multicall3",
+    "versions": [
+      {
+        "address": "0x73005faad1e31b4cda289acceda512a274925ccf",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:18:44.077Z",
+        "sourceGitSha": "19829ea433d2f201d29b9389a9c0e0ea2ba5fad3",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV2Factory",
+    "versions": [
+      {
+        "address": "0x4f5a0c4817d28e83afe256e9ef74a14b05de3231",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:18:44.077Z",
+        "sourceGitSha": "19829ea433d2f201d29b9389a9c0e0ea2ba5fad3",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV2Router",
+    "versions": [
+      {
+        "address": "0x07b431188600441e721802df78b336840afc8c48",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:18:44.077Z",
+        "sourceGitSha": "19829ea433d2f201d29b9389a9c0e0ea2ba5fad3",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "ERC20Factory",
+    "versions": [
+      {
+        "address": "0x0152e1c5b87e608fbd46fa3506fc3143027f3895",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-16T23:18:44.077Z",
+        "sourceGitSha": "19829ea433d2f201d29b9389a9c0e0ea2ba5fad3",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV3Factory",
+    "versions": [
+      {
+        "address": "0x5818cf0caa5315283720cc5ab9f9a8dee81ea1d3",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T04:55:24.823Z",
+        "sourceGitSha": "7598436db261e917cbc80bc821f7c21689027596",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "SwapRouter",
+    "versions": [
+      {
+        "address": "0x1f334c3babcfd67227dba3a35746eee9ec3f7e96",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T04:55:24.823Z",
+        "sourceGitSha": "7598436db261e917cbc80bc821f7c21689027596",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "NonfungiblePositionManager",
+    "versions": [
+      {
+        "address": "0xd19e804fb361b5b76c8d64251e26e76a405bdc44",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T04:55:24.823Z",
+        "sourceGitSha": "7598436db261e917cbc80bc821f7c21689027596",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "QuoterV2",
+    "versions": [
+      {
+        "address": "0x85de725e2712899f73d6a53736b05c45c45fb4c2",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T04:55:24.823Z",
+        "sourceGitSha": "7598436db261e917cbc80bc821f7c21689027596",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "NFTDescriptor",
+    "versions": [
+      {
+        "address": "0x518e344911c38abb675405933b9726cbdfb53ffa",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T04:55:24.823Z",
+        "sourceGitSha": "7598436db261e917cbc80bc821f7c21689027596",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "NonfungibleTokenPositionDescriptor",
+    "versions": [
+      {
+        "address": "0x6137e56cd30b1728196f01279f5b2a799487372c",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T04:55:24.823Z",
+        "sourceGitSha": "7598436db261e917cbc80bc821f7c21689027596",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "TickLens",
+    "versions": [
+      {
+        "address": "0xf220ca21c900f870856b25575844efedd3be9b3d",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T04:55:24.823Z",
+        "sourceGitSha": "7598436db261e917cbc80bc821f7c21689027596",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "V3Migrator",
+    "versions": [
+      {
+        "address": "0x09e4d82f31cf4a2d819cb08747ce5db59f74032c",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T04:55:24.823Z",
+        "sourceGitSha": "7598436db261e917cbc80bc821f7c21689027596",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "Permit2",
+    "versions": [
+      {
+        "address": "0x2e63588ad19c812ad72959f0be1e30137a68891a",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T16:16:32Z",
+        "sourceGitSha": "5e6bad7e88ff514c306b28e18584ec0e202583c6",
+        "compilerVersion": "0.8.17+commit.8df45f5f"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV4PoolManager",
+    "versions": [
+      {
+        "address": "0x498cdac7c86f2aba1af0d0eb40c93f64cd200582",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T16:16:32Z",
+        "sourceGitSha": "5e6bad7e88ff514c306b28e18584ec0e202583c6",
+        "compilerVersion": "0.8.26+commit.8a97fa7a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV4PositionManager",
+    "versions": [
+      {
+        "address": "0x22582e77686df4f6ec45bc95364e30a7238899ef",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T16:16:32Z",
+        "sourceGitSha": "5e6bad7e88ff514c306b28e18584ec0e202583c6",
+        "compilerVersion": "0.8.26+commit.8a97fa7a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV4PositionDescriptor",
+    "versions": [
+      {
+        "address": "0x8ecb5440219fa3b9dfc07b0c195164f86355e147",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T16:16:32Z",
+        "sourceGitSha": "5e6bad7e88ff514c306b28e18584ec0e202583c6",
+        "compilerVersion": "0.8.26+commit.8a97fa7a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV4StateView",
+    "versions": [
+      {
+        "address": "0x59e0c725e14707c7985de3159052c93e04af33eb",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T16:16:32Z",
+        "sourceGitSha": "5e6bad7e88ff514c306b28e18584ec0e202583c6",
+        "compilerVersion": "0.8.26+commit.8a97fa7a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV4Quoter",
+    "versions": [
+      {
+        "address": "0x4b6711949e27e6199f7ae8b57b39521a2a032f49",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T16:16:32Z",
+        "sourceGitSha": "5e6bad7e88ff514c306b28e18584ec0e202583c6",
+        "compilerVersion": "0.8.26+commit.8a97fa7a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV4UniversalRouter",
+    "versions": [
+      {
+        "address": "0x22bd5da7489c39af078ec787c55268ca06346711",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-06-17T16:16:32Z",
+        "sourceGitSha": "5e6bad7e88ff514c306b28e18584ec0e202583c6",
+        "compilerVersion": "0.8.26+commit.8a97fa7a"
+      }
+    ]
+  }
+]

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1",
+  "primary": {
+    "devnet": "RPTWwELXAY4KC9ZPHhaxp7Sq1hHtU3HNEgLbSegCcWf",
+    "testnet": "RomeTaTNPJNBxtB3Wong9geVTtkEFJfUqgktQVq3iSX",
+    "mainnet": "RomePq9X3iAoTr813HR7uRarafFDUJty6GdiEceYpzX"
+  },
+  "programs": {
+    "RomeDbGQYbqomGVk13h9JkQHKoNWKB84Lw1ij9AtRXT": {
+      "cluster": "devnet",
+      "network": "devnet",
+      "role": "retired",
+      "kind": "rome-evm",
+      "chainsHosted": []
+    },
+    "romedpkFKEu3JJrYujtNUferyEv47UxvjZe2QcdPwN8": {
+      "cluster": "devnet",
+      "network": "devnet",
+      "role": "secondary",
+      "kind": "rome-evm",
+      "chainsHosted": [
+        "121301-marcus"
+      ]
+    },
+    "4AWSc6t1iG6MuJZBQiDWCMsaPoypxgYnGxC9FguT2eEE": {
+      "cluster": "devnet",
+      "network": "testnet",
+      "role": "closed",
+      "kind": "rome-evm",
+      "chainsHosted": []
+    },
+    "RPTAqWeyJk1RFV3E4eDe1eMK9thPVoav7NBcFmmh2JP": {
+      "cluster": "testnet",
+      "network": "real-testnet",
+      "role": "primary",
+      "kind": "rome-evm",
+      "chainsHosted": [
+        "30001-aurelius"
+      ]
+    },
+    "RomeTaTNPJNBxtB3Wong9geVTtkEFJfUqgktQVq3iSX": {
+      "cluster": "devnet",
+      "network": "testnet",
+      "role": "primary",
+      "kind": "rome-evm",
+      "chainsHosted": [
+        "121214-martius",
+        "210000-nerva"
+      ]
+    },
+    "RPTWwELXAY4KC9ZPHhaxp7Sq1hHtU3HNEgLbSegCcWf": {
+      "cluster": "devnet",
+      "network": "devnet",
+      "role": "primary",
+      "kind": "rome-evm",
+      "chainsHosted": [
+        "121302-trajan",
+        "200010-hadrian"
+      ]
+    },
+    "RomePq9X3iAoTr813HR7uRarafFDUJty6GdiEceYpzX": {
+      "cluster": "mainnet",
+      "network": "mainnet",
+      "role": "primary",
+      "kind": "rome-evm",
+      "chainsHosted": []
+    },
+    "RomDAfMHwqmjnkpVhya5svp65k6nzR4E1dNxS3fYh79": {
+      "cluster": "devnet",
+      "network": "devnet",
+      "role": "secondary",
+      "kind": "rome-evm",
+      "chainsHosted": [
+        "121212-esquiline",
+        "121213-subura"
+      ]
+    }
+  }
+}

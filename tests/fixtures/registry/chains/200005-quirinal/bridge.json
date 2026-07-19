@@ -1,0 +1,24 @@
+{
+  "sourceEvm": {
+    "chainId": 11155111,
+    "name": "Sepolia",
+    "rpcUrl": "https://ethereum-sepolia-rpc.publicnode.com",
+    "cctpTokenMessenger": "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5",
+    "cctpMessageTransmitter": "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD",
+    "wormholeTokenBridge": "0xDB5492265f6038831E89f495670FF909aDe94bd9"
+  },
+  "cctpIrisApiBase": "https://iris-api-sandbox.circle.com",
+  "assets": [
+    {
+      "id": "usdc",
+      "symbol": "USDC",
+      "name": "USD Coin",
+      "decimals": 6,
+      "solanaMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "sourceEvm": {
+        "address": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        "protocol": "cctp"
+      }
+    }
+  ]
+}

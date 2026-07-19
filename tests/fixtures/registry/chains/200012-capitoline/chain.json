@@ -1,0 +1,18 @@
+{
+  "chainId": 200012,
+  "name": "Rome Capitoline",
+  "network": "testnet",
+  "rpcUrl": "https://capitoline.testnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-capitoline.testnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Capitoline",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "retired",
+  "romeEvmProgramId": "RomeTaTNPJNBxtB3Wong9geVTtkEFJfUqgktQVq3iSX",
+  "solana": {
+    "cluster": "devnet",
+    "explorerUrl": "https://explorer.solana.com"
+  }
+}

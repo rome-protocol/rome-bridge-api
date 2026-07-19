@@ -1,0 +1,17 @@
+{
+  "chainId": 210000,
+  "name": "Rome Nerva",
+  "network": "testnet",
+  "rpcUrl": "https://nerva.testnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-nerva.testnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Nerva",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "live",
+  "romeEvmProgramId": "RomeTaTNPJNBxtB3Wong9geVTtkEFJfUqgktQVq3iSX",
+  "solana": {
+    "cluster": "devnet"
+  }
+}

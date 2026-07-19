@@ -1,0 +1,480 @@
+[
+  {
+    "name": "ERC20SPLFactory",
+    "versions": [
+      {
+        "address": "0xa3f119337d58b3db575748632958734f6b002f31",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T20:51:00Z",
+        "sourceGitSha": "6037356391be3caa4f2b97cf8e5b6028d1bcbffa",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      },
+      {
+        "address": "0xbd0a59183cd4178b8b000036c64c7aeef4619be1",
+        "version": "1.2.0",
+        "status": "retired",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "deprecatedAt": "2026-05-24T20:51:00Z",
+        "replacedBy": "0xa3f119337d58b3db575748632958734f6b002f31",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "RomeBridgePaymaster",
+    "versions": [
+      {
+        "address": "0x701c4129394129f2b8244f6a68806ec43aec5ec1",
+        "version": "1.9.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "ERC20Users",
+    "versions": [
+      {
+        "address": "0xe33fea3df27d7bfe28c774b10e8891802ec7ab04",
+        "version": "1.5.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "SPL_ERC20_USDC",
+    "versions": [
+      {
+        "address": "0xddbb7d989b70ed93ca0849c0b9a007f6e0009359",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "SPL_ERC20_WETH",
+    "versions": [
+      {
+        "address": "0x1551cb2767291d033da2e242fd69bc86428c5d64",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "RomeBridgeWithdraw",
+    "versions": [
+      {
+        "address": "0x739cf06175a547570a1022db59488e02d26817cb",
+        "version": "1.9.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "OracleAdapterFactory",
+    "versions": [
+      {
+        "address": "0x7155f98abf83d58da6d00ffdbe56764219680cca",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "PythPullAdapter",
+    "versions": [
+      {
+        "address": "0x80a971f2a8fe2c384d4bcb6088210a8207adcae6",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "SwitchboardV3Adapter",
+    "versions": [
+      {
+        "address": "0x755f6779292e23576257589826df5df4837e958f",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "BatchReader",
+    "versions": [
+      {
+        "address": "0x8430cd93135e1ba656fad86d134669e94a0e58ea",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "MeteoraDAMMv1Factory",
+    "versions": [
+      {
+        "address": "0xe7a332ea0aba1402c20c1e4d1c687aaac3b660a4",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "WETH9",
+    "versions": [
+      {
+        "address": "0x23f2b5417f0d3c79996622fd270fad21a85dafc9",
+        "version": "3.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:00:00Z",
+        "sourceGitSha": "70a6cfe4d96c73b4d606b6e3e545e4492a1670a1",
+        "compilerVersion": "0.8.20+commit.a1b79de6"
+      },
+      {
+        "address": "0x5a32c78a77ec8e0a2d345cede2a36e56312ba3ad",
+        "version": "2.0.0",
+        "status": "retired",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a",
+        "deprecatedAt": "2026-05-24T21:00:00Z",
+        "replacedBy": "0x23f2b5417f0d3c79996622fd270fad21a85dafc9"
+      }
+    ]
+  },
+  {
+    "name": "Multicall3",
+    "versions": [
+      {
+        "address": "0x7b2c5f229d2116f654fe59bbe083daebf13fd4ce",
+        "version": "3.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:00:00Z",
+        "sourceGitSha": "70a6cfe4d96c73b4d606b6e3e545e4492a1670a1",
+        "compilerVersion": "0.8.20+commit.a1b79de6"
+      },
+      {
+        "address": "0x72da8cc8ca5236cda17eaa055b4a620b09930b4c",
+        "version": "2.0.0",
+        "status": "retired",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a",
+        "deprecatedAt": "2026-05-24T21:00:00Z",
+        "replacedBy": "0x7b2c5f229d2116f654fe59bbe083daebf13fd4ce"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV2Factory",
+    "versions": [
+      {
+        "address": "0x51627af7d54d080925ba944a340c0047b1517b13",
+        "version": "3.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:00:00Z",
+        "sourceGitSha": "70a6cfe4d96c73b4d606b6e3e545e4492a1670a1",
+        "compilerVersion": "0.8.20+commit.a1b79de6"
+      },
+      {
+        "address": "0x4a1e83ac464ec21fc06a06cadf42719d4c444c20",
+        "version": "2.0.0",
+        "status": "retired",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a",
+        "deprecatedAt": "2026-05-24T21:00:00Z",
+        "replacedBy": "0x51627af7d54d080925ba944a340c0047b1517b13"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV2Router",
+    "versions": [
+      {
+        "address": "0x262d007d1700f9717f8974028e973d1081915515",
+        "version": "3.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:00:00Z",
+        "sourceGitSha": "70a6cfe4d96c73b4d606b6e3e545e4492a1670a1",
+        "compilerVersion": "0.8.20+commit.a1b79de6"
+      },
+      {
+        "address": "0xdfbeba753699137f3619bf57398d308f01efe3d5",
+        "version": "2.0.0",
+        "status": "retired",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a",
+        "deprecatedAt": "2026-05-24T21:00:00Z",
+        "replacedBy": "0x262d007d1700f9717f8974028e973d1081915515"
+      }
+    ]
+  },
+  {
+    "name": "ERC20Factory",
+    "versions": [
+      {
+        "address": "0xe040883cf64e93ff515d74fe9b89b6ddf4d05bc1",
+        "version": "3.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:00:00Z",
+        "sourceGitSha": "70a6cfe4d96c73b4d606b6e3e545e4492a1670a1",
+        "compilerVersion": "0.8.20+commit.a1b79de6"
+      },
+      {
+        "address": "0xa4475cafceb431fa5cba1583660df5b83f4783e9",
+        "version": "2.0.0",
+        "status": "retired",
+        "deployedAt": "2026-05-07T00:18:33Z",
+        "sourceGitSha": "52417feaa1ee8b2f5b9e57b58cd2dd45e9a4afed",
+        "compilerVersion": "0.8.28+commit.7893614a",
+        "deprecatedAt": "2026-05-24T21:00:00Z",
+        "replacedBy": "0xe040883cf64e93ff515d74fe9b89b6ddf4d05bc1"
+      }
+    ]
+  },
+  {
+    "name": "PdaActivator",
+    "versions": [
+      {
+        "address": "0x03cabd272b9ae3e2a99114f12a5c0bdd8646cebb",
+        "version": "1.0.0",
+        "status": "retired",
+        "deployedAt": "2026-05-07T16:30:00Z",
+        "deprecatedAt": "2026-05-08T05:15:00Z",
+        "replacedBy": "0xae0c7f2cae1968f18473b77c95b686251032ecd6",
+        "bytecodeSha256": "404e3c108927268faf76438c87e3af1b53a5bbd35637f27cbd41941ef9358294",
+        "sourceGitSha": "85b39e43bbb019af301e92f6d04a63ec8fe43990",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "SimpleActivator",
+    "versions": [
+      {
+        "address": "0x0ff38f688f3f7ec02d50f29fc757fe00e2fcb565",
+        "version": "2.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-08T08:00:00Z",
+        "bytecodeSha256": "75a19151aeac79e769427cc7573c412da13bd22f6d26f8594b78d0f4b1f9ff52",
+        "sourceGitSha": "29baa0879ee33a511ea4ec2b31ecb423363ef407",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      },
+      {
+        "address": "0xae0c7f2cae1968f18473b77c95b686251032ecd6",
+        "version": "1.0.0",
+        "status": "retired",
+        "deployedAt": "2026-05-08T05:15:00Z",
+        "deprecatedAt": "2026-05-08T08:00:00Z",
+        "replacedBy": "0x0ff38f688f3f7ec02d50f29fc757fe00e2fcb565",
+        "bytecodeSha256": "c93dbd94148c8743a39ea863eb4b5985ee4877fa883e61ccabce5f926f1860ad",
+        "sourceGitSha": "098d426186a93f47bd79ce44284bd6262949bdbc",
+        "compilerVersion": "0.8.28+commit.7893614a"
+      }
+    ]
+  },
+  {
+    "name": "UniswapV3Factory",
+    "versions": [
+      {
+        "address": "0x723669439fae897c71ac284722276441103af2b7",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:05:00Z",
+        "sourceGitSha": "ed090a1edbed0b972584a37ff6b11a2ef903789c",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "SwapRouter",
+    "versions": [
+      {
+        "address": "0x6204789f30827937cedb831bf893025b83aaa1ee",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:05:00Z",
+        "sourceGitSha": "ed090a1edbed0b972584a37ff6b11a2ef903789c",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "NFTDescriptor",
+    "versions": [
+      {
+        "address": "0xabf3ac5ad2ed7535bd827f237c531742ddd4110f",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:05:00Z",
+        "sourceGitSha": "ed090a1edbed0b972584a37ff6b11a2ef903789c",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "NonfungibleTokenPositionDescriptor",
+    "versions": [
+      {
+        "address": "0x2eeac910f9f409ea06dfef322e5c0752314cc72a",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:05:00Z",
+        "sourceGitSha": "ed090a1edbed0b972584a37ff6b11a2ef903789c",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "NonfungiblePositionManager",
+    "versions": [
+      {
+        "address": "0x12bb78c98e6fc2f03425fb071646a94b89ad40be",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:05:00Z",
+        "sourceGitSha": "ed090a1edbed0b972584a37ff6b11a2ef903789c",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "QuoterV2",
+    "versions": [
+      {
+        "address": "0x5fec737fe23bf97ca4478328e202b7364a8f459c",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:05:00Z",
+        "sourceGitSha": "ed090a1edbed0b972584a37ff6b11a2ef903789c",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "TickLens",
+    "versions": [
+      {
+        "address": "0x219f2835337693116580c4601d13b32468928e51",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:05:00Z",
+        "sourceGitSha": "ed090a1edbed0b972584a37ff6b11a2ef903789c",
+        "compilerVersion": "0.7.6+commit.7338295f"
+      }
+    ]
+  },
+  {
+    "name": "PoolAddressesProvider",
+    "versions": [
+      {
+        "address": "0x3e59b4ea4ced96b5d0f6adf5edfa5d5afb7617c0",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:08:35Z",
+        "sourceGitSha": "fc4067ec9cfc8f6a5f17120a467483179b0aa68a",
+        "compilerVersion": "0.8.27+commit.40a35a09"
+      }
+    ]
+  },
+  {
+    "name": "ACLManager",
+    "versions": [
+      {
+        "address": "0x17c09f00f5231572269e2e58449af668f99bb1a6",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:08:35Z",
+        "sourceGitSha": "fc4067ec9cfc8f6a5f17120a467483179b0aa68a",
+        "compilerVersion": "0.8.27+commit.40a35a09"
+      }
+    ]
+  },
+  {
+    "name": "PoolConfigurator",
+    "versions": [
+      {
+        "address": "0x5adaa6a94c19f2fef97bbacbb6f5e14c5ae3b1df",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:08:35Z",
+        "sourceGitSha": "fc4067ec9cfc8f6a5f17120a467483179b0aa68a",
+        "compilerVersion": "0.8.27+commit.40a35a09"
+      }
+    ]
+  },
+  {
+    "name": "AaveOracle",
+    "versions": [
+      {
+        "address": "0x2538b79b9c9de907da9b45ab3ba251e70fc9b98e",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:08:35Z",
+        "sourceGitSha": "fc4067ec9cfc8f6a5f17120a467483179b0aa68a",
+        "compilerVersion": "0.8.27+commit.40a35a09"
+      }
+    ]
+  },
+  {
+    "name": "AaveProtocolDataProvider",
+    "versions": [
+      {
+        "address": "0xff2d2b2be6da0732422dad756c93b6ee92df43bf",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:08:35Z",
+        "sourceGitSha": "fc4067ec9cfc8f6a5f17120a467483179b0aa68a",
+        "compilerVersion": "0.8.27+commit.40a35a09"
+      }
+    ]
+  },
+  {
+    "name": "DefaultReserveInterestRateStrategyV2",
+    "versions": [
+      {
+        "address": "0x008242f5100fe2d6315cf00ed37d1fa31af410ca",
+        "version": "1.0.0",
+        "status": "live",
+        "deployedAt": "2026-05-24T21:08:35Z",
+        "sourceGitSha": "fc4067ec9cfc8f6a5f17120a467483179b0aa68a",
+        "compilerVersion": "0.8.27+commit.40a35a09"
+      }
+    ]
+  }
+]

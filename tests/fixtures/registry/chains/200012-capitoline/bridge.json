@@ -1,0 +1,43 @@
+{
+  "sourceEvm": {
+    "chainId": 11155111,
+    "name": "Sepolia",
+    "rpcUrl": "https://ethereum-sepolia-rpc.publicnode.com",
+    "explorerUrl": "https://sepolia.etherscan.io",
+    "cctpTokenMessenger": "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5",
+    "cctpMessageTransmitter": "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD",
+    "wormholeTokenBridge": "0xDB5492265f6038831E89f495670FF909aDe94bd9"
+  },
+  "cctpIrisApiBase": "https://iris-api-sandbox.circle.com",
+  "solana": {
+    "cctpDomain": 5,
+    "cctpMessageTransmitterProgram": "CCTPmbSD7gX1bxKPAmg77w8oFzNFpaQiQUWD43TKaecd",
+    "cctpTokenMessengerMinterProgram": "CCTPiPYPc6AsJuwueEnWgSgucamXDZwBd53dQ11YiKX3",
+    "cctpMessageTransmitterProgramV2": "CCTPV2Sm4AdWt5296sk4P66VBZ7bEhcARwFaaS9YPbeC",
+    "cctpTokenMessengerMinterProgramV2": "CCTPV2vPZJS2u2BBsUoscuikbYjnpFmbFsvVuJdgUMQe"
+  },
+  "assets": [
+    {
+      "id": "usdc",
+      "symbol": "USDC",
+      "name": "USD Coin",
+      "decimals": 6,
+      "solanaMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "sourceEvm": {
+        "address": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        "protocol": "cctp"
+      }
+    },
+    {
+      "id": "eth",
+      "symbol": "ETH",
+      "name": "Wrapped Ether",
+      "decimals": 8,
+      "solanaMint": "6F5YWWrUMNpee8C6BDUc6DmRvYRMDDTgJHwKhbXuifWs",
+      "sourceEvm": {
+        "address": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+        "protocol": "wormhole"
+      }
+    }
+  ]
+}

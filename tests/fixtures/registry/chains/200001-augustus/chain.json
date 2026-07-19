@@ -1,0 +1,17 @@
+{
+  "chainId": 200001,
+  "name": "Rome Augustus",
+  "network": "testnet",
+  "rpcUrl": "https://augustus.testnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-augustus.testnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Augustus",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "retired",
+  "romeEvmProgramId": "RomeTaTNPJNBxtB3Wong9geVTtkEFJfUqgktQVq3iSX",
+  "solana": {
+    "cluster": "devnet"
+  }
+}

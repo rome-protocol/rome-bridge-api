@@ -1,0 +1,17 @@
+{
+  "chainId": 121212,
+  "name": "Rome Esquiline",
+  "network": "devnet",
+  "rpcUrl": "https://esquiline.devnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-esquiline.devnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Esquiline Gas",
+    "symbol": "GAS",
+    "decimals": 18
+  },
+  "status": "live",
+  "romeEvmProgramId": "RomDAfMHwqmjnkpVhya5svp65k6nzR4E1dNxS3fYh79",
+  "solana": {
+    "cluster": "devnet"
+  }
+}

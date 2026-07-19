@@ -1,0 +1,19 @@
+{
+  "chainId": 200010,
+  "name": "Rome Hadrian",
+  "network": "devnet",
+  "rpcUrl": "https://hadrian.testnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-hadrian.testnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Hadrian",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "live",
+  "romeEvmProgramId": "RPTWwELXAY4KC9ZPHhaxp7Sq1hHtU3HNEgLbSegCcWf",
+  "solana": {
+    "cluster": "devnet",
+    "explorerUrl": "https://explorer.solana.com",
+    "rpc": "https://api.devnet.solana.com"
+  }
+}

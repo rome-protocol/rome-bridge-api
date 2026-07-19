@@ -1,0 +1,17 @@
+{
+  "chainId": 121213,
+  "name": "Rome Subura",
+  "network": "devnet",
+  "rpcUrl": "https://subura.devnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-subura.devnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Subura",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "live",
+  "romeEvmProgramId": "RomDAfMHwqmjnkpVhya5svp65k6nzR4E1dNxS3fYh79",
+  "solana": {
+    "cluster": "devnet"
+  }
+}

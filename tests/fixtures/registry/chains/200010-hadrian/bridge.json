@@ -1,0 +1,172 @@
+{
+  "sourceEvm": {
+    "chainId": 11155111,
+    "name": "Sepolia",
+    "rpcUrl": "https://ethereum-sepolia-rpc.publicnode.com",
+    "explorerUrl": "https://sepolia.etherscan.io",
+    "cctpTokenMessenger": "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5",
+    "cctpMessageTransmitter": "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD",
+    "cctpVersion": 2,
+    "cctpDomain": 0,
+    "cctpTokenMessengerV2": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+    "cctpMessageTransmitterV2": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275",
+    "wormholeTokenBridge": "0xDB5492265f6038831E89f495670FF909aDe94bd9",
+    "wormholeCoreBridge": "0x4a8bc80Ed5a4067f1CCf107057b8270E0cC11A78",
+    "wormholeChainId": 10002
+  },
+  "sourceEvms": [
+    {
+      "chainId": 10143,
+      "name": "Monad Testnet",
+      "rpcUrl": "https://testnet-rpc.monad.xyz",
+      "explorerUrl": "https://testnet.monadexplorer.com",
+      "cctpVersion": 2,
+      "cctpDomain": 15,
+      "cctpTokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpTokenMessengerV2": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpMessageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275"
+    },
+    {
+      "chainId": 80002,
+      "name": "Polygon Amoy",
+      "rpcUrl": "https://rpc-amoy.polygon.technology",
+      "explorerUrl": "https://amoy.polygonscan.com",
+      "cctpVersion": 2,
+      "cctpDomain": 7,
+      "cctpTokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpTokenMessengerV2": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpMessageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275"
+    },
+    {
+      "chainId": 421614,
+      "name": "Arbitrum Sepolia",
+      "rpcUrl": "https://sepolia-rollup.arbitrum.io/rpc",
+      "explorerUrl": "https://sepolia.arbiscan.io",
+      "cctpVersion": 2,
+      "cctpDomain": 3,
+      "cctpTokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpTokenMessengerV2": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpMessageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275"
+    },
+    {
+      "chainId": 84532,
+      "name": "Base Sepolia",
+      "rpcUrl": "https://sepolia.base.org",
+      "explorerUrl": "https://sepolia.basescan.org",
+      "cctpVersion": 2,
+      "cctpDomain": 6,
+      "cctpTokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpTokenMessengerV2": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpMessageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275"
+    },
+    {
+      "chainId": 43113,
+      "name": "Avalanche Fuji",
+      "rpcUrl": "https://api.avax-test.network/ext/bc/C/rpc",
+      "explorerUrl": "https://testnet.snowtrace.io",
+      "cctpVersion": 2,
+      "cctpDomain": 1,
+      "cctpTokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpTokenMessengerV2": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+      "cctpMessageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275"
+    }
+  ],
+  "cctpIrisApiBase": "https://iris-api-sandbox.circle.com",
+  "wormholescanBaseUrl": "https://api.testnet.wormholescan.io",
+  "solana": {
+    "cctpDomain": 5,
+    "cctpMessageTransmitterProgram": "CCTPmbSD7gX1bxKPAmg77w8oFzNFpaQiQUWD43TKaecd",
+    "cctpTokenMessengerMinterProgram": "CCTPiPYPc6AsJuwueEnWgSgucamXDZwBd53dQ11YiKX3",
+    "cctpMessageTransmitterProgramV2": "CCTPV2Sm4AdWt5296sk4P66VBZ7bEhcARwFaaS9YPbeC",
+    "cctpTokenMessengerMinterProgramV2": "CCTPV2vPZJS2u2BBsUoscuikbYjnpFmbFsvVuJdgUMQe"
+  },
+  "assets": [
+    {
+      "id": "usdc",
+      "symbol": "USDC",
+      "name": "USD Coin",
+      "decimals": 6,
+      "solanaMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "sourceEvm": {
+        "address": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        "protocol": "cctp"
+      }
+    },
+    {
+      "id": "eth",
+      "symbol": "ETH",
+      "name": "Wrapped Ether",
+      "decimals": 8,
+      "solanaMint": "6F5YWWrUMNpee8C6BDUc6DmRvYRMDDTgJHwKhbXuifWs",
+      "sourceEvm": {
+        "address": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+        "protocol": "wormhole"
+      }
+    },
+    {
+      "id": "usdc-monad",
+      "symbol": "USDC",
+      "name": "USD Coin (from Monad)",
+      "decimals": 6,
+      "solanaMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "sourceEvm": {
+        "chainId": 10143,
+        "address": "0x534b2f3A21130d7a60830c2Df862319e593943A3",
+        "protocol": "cctp",
+        "cctpVersion": 2
+      }
+    },
+    {
+      "id": "usdc-polygon",
+      "symbol": "USDC",
+      "name": "USD Coin (from Polygon Amoy)",
+      "decimals": 6,
+      "solanaMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "sourceEvm": {
+        "chainId": 80002,
+        "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
+        "protocol": "cctp",
+        "cctpVersion": 2
+      }
+    },
+    {
+      "id": "usdc-arbitrum",
+      "symbol": "USDC",
+      "name": "USD Coin (from Arbitrum Sepolia)",
+      "decimals": 6,
+      "solanaMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "sourceEvm": {
+        "chainId": 421614,
+        "address": "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
+        "protocol": "cctp",
+        "cctpVersion": 2
+      }
+    },
+    {
+      "id": "usdc-base",
+      "symbol": "USDC",
+      "name": "USD Coin (from Base Sepolia)",
+      "decimals": 6,
+      "solanaMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "sourceEvm": {
+        "chainId": 84532,
+        "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "protocol": "cctp",
+        "cctpVersion": 2
+      }
+    },
+    {
+      "id": "usdc-avax",
+      "symbol": "USDC",
+      "name": "USD Coin (from Avalanche Fuji)",
+      "decimals": 6,
+      "solanaMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "sourceEvm": {
+        "chainId": 43113,
+        "address": "0x5425890298aed601595a70AB815c96711a31Bc65",
+        "protocol": "cctp",
+        "cctpVersion": 2
+      }
+    }
+  ]
+}

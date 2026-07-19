@@ -1,0 +1,17 @@
+{
+  "chainId": 200011,
+  "name": "Rome Viminal",
+  "network": "testnet",
+  "rpcUrl": "https://viminal.testnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-viminal.devnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Viminal",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "retired",
+  "romeEvmProgramId": "RomeTaTNPJNBxtB3Wong9geVTtkEFJfUqgktQVq3iSX",
+  "solana": {
+    "cluster": "devnet"
+  }
+}

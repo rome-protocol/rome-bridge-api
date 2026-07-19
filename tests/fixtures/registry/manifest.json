@@ -1,0 +1,29 @@
+{
+  "source": "rome-protocol/rome-registry",
+  "gitSha": "0eaa5ac95fa86a232b544d7377e44d40869ef7c6",
+  "gitDescribe": "2026-07-04T19:57:47+03:00",
+  "registryVersion": "0.23.0",
+  "generatedAt": "2026-07-04T17:30:59.745Z",
+  "generator": "scripts/gen-registry-fixtures.ts",
+  "chains": [
+    "121212-esquiline",
+    "121213-subura",
+    "121214-martius",
+    "121301-marcus",
+    "121302-trajan",
+    "200001-augustus",
+    "200003-quirinal",
+    "200004-quirinal",
+    "200005-quirinal",
+    "200006-quirinal",
+    "200009-numa",
+    "200010-hadrian",
+    "200011-viminal",
+    "200012-capitoline",
+    "210000-nerva",
+    "30001-aurelius"
+  ],
+  "synthetic": [
+    "999999-synthetic-unknown-status"
+  ]
+}

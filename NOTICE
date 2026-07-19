@@ -1,0 +1,26 @@
+rome-bridge-api
+Copyright 2026 Rome Protocol
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+-------------------------------------------------------------------------------
+Third-party protocols (interoperated with, not included)
+-------------------------------------------------------------------------------
+rome-bridge-api is an off-chain HTTP orchestrator. It composes public
+cross-chain transport and on-chain bridge primitives via their public
+interfaces; it does NOT contain, fork, or redistribute the source of any of
+these protocols, each of which remains the property of its authors and is
+governed by its own license and trademarks:
+
+  Circle CCTP (Cross-Chain Transfer Protocol) · Wormhole.
+
+Chain metadata (chainIds, contract addresses, gas mints, bridge wiring) is
+sourced from the public rome-protocol/rome-registry.
+
+-------------------------------------------------------------------------------
+Third-party libraries
+-------------------------------------------------------------------------------
+This product depends on open-source npm packages under their respective
+licenses (MIT: fastify, @fastify/*, viem, zod, ioredis, pino, dotenv-flow;
+Apache-2.0: @solana/web3.js, @solana/spl-token, @wormhole-foundation/sdk-*,
+prom-client — and others; see package.json and their license files).

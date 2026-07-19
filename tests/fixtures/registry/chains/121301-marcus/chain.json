@@ -1,0 +1,17 @@
+{
+  "chainId": 121301,
+  "name": "Rome Marcus",
+  "network": "devnet",
+  "rpcUrl": "https://marcus.devnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-marcus.devnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Marcus",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "retired",
+  "romeEvmProgramId": "romedpkFKEu3JJrYujtNUferyEv47UxvjZe2QcdPwN8",
+  "solana": {
+    "cluster": "devnet"
+  }
+}

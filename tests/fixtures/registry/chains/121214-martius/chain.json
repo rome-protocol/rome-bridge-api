@@ -1,0 +1,17 @@
+{
+  "chainId": 121214,
+  "name": "Rome Martius",
+  "network": "testnet",
+  "rpcUrl": "https://martius.testnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-martius.testnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Martius",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "live",
+  "romeEvmProgramId": "RomeTaTNPJNBxtB3Wong9geVTtkEFJfUqgktQVq3iSX",
+  "solana": {
+    "cluster": "devnet"
+  }
+}

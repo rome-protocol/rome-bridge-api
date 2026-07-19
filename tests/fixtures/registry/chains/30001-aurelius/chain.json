@@ -1,0 +1,18 @@
+{
+  "chainId": 30001,
+  "name": "Rome Aurelius",
+  "network": "real-testnet",
+  "rpcUrl": "https://aurelius.real-testnet.romeprotocol.xyz/",
+  "explorerUrl": "https://via-aurelius.real-testnet.romeprotocol.xyz/",
+  "nativeCurrency": {
+    "name": "Rome Aurelius",
+    "symbol": "USDC",
+    "decimals": 18
+  },
+  "status": "retired",
+  "romeEvmProgramId": "RPTAqWeyJk1RFV3E4eDe1eMK9thPVoav7NBcFmmh2JP",
+  "solana": {
+    "cluster": "testnet",
+    "rpc": "https://api.devnet.solana.com"
+  }
+}
