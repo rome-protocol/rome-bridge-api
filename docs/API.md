@@ -12,7 +12,7 @@ This document is the integrator reference. The API exposes deterministic bridge 
 - [Authentication](#authentication)
 - [Base URL and versioning](#base-url-and-versioning)
 - [Conventions](#conventions)
-- [The eight routes](#the-eight-routes)
+- [The route catalog](#the-route-catalog)
 - [Endpoint reference](#endpoint-reference)
   - [`GET /v1/health`](#get-v1health)
   - [`GET /v1/assets`](#get-v1assets)
@@ -100,13 +100,13 @@ Both checks are evaluated on every `POST`. Natural key wins if both indicate the
 
 ---
 
-## The eight routes
+## The route catalog
 
-The API supports eight routes — three assets crossed with two directions, with separate routes for the two source chains (Ethereum vs Solana) where both apply:
+The API supports eleven routes — five assets (USDC, ETH, SOL, any SPL token, generic TOKEN egress) across the two directions, with separate routes per source chain where both apply:
 
 | Route key | Asset | Source chain | Direction | Bridge mechanism |
 |---|---|---|---|---|
-| `usdc-cctp-to-rome` | USDC | Ethereum | inbound | Circle CCTP burn-and-mint |
+| `usdc-cctp-to-rome` | USDC | any catalog EVM chain (Sepolia, Arbitrum, Base, Fuji, Amoy, Monad — see `/v1/assets`) | inbound | Circle CCTP v2 burn-and-mint |
 | `usdc-cctp-from-rome` | USDC | Rome | outbound | Circle CCTP burn-and-mint |
 | `usdc-solana-to-rome` | USDC | Solana | inbound | SPL transfer via PDA-ATA |
 | `usdc-solana-from-rome` | USDC | Rome | outbound | Atomic Rome tx to SPL destination |
@@ -114,8 +114,11 @@ The API supports eight routes — three assets crossed with two directions, with
 | `eth-wormhole-from-rome` | ETH | Rome | outbound | Rome approve + burn → Ethereum claim |
 | `sol-solana-to-rome` | SOL | Solana | inbound | wSOL transfer + optional claim |
 | `sol-solana-from-rome` | SOL | Rome | outbound | Atomic Rome tx (wSOL wrapper) |
+| `spl-solana-to-rome` | SPL (any mint, incl. LSTs) | Solana | inbound | SPL transfer via PDA-ATA (`splAsset` selects the mint) |
+| `spl-solana-from-rome` | SPL (any mint, incl. LSTs) | Rome | outbound | Mint-explicit Rome withdraw to an SPL destination |
+| `token-wormhole-from-rome` | TOKEN (generic) | Rome | outbound | Wormhole egress for a generic token |
 
-The full machine-readable catalog is at `GET /v1/assets`, including per-route min and max amount limits.
+Outbound CCTP (`usdc-cctp-from-rome`) likewise reaches any catalog EVM destination via `destinationChainId`. The full machine-readable catalog is at `GET /v1/assets`, including per-route min and max amount limits.
 
 ---
 
@@ -557,17 +560,17 @@ When `outcome` reaches `complete`, the user has 1 USDC of Rome chain `200010` ga
 
 ### Total user signatures
 
-The user signs **only step 1's two Ethereum txs**. Steps 2 and 3 are sponsored — they don't require user signatures and don't consume user gas.
+The user signs **step 1's two source-chain txs** — plus, on **gas-intent CCTP inbound**, one off-chain **EIP-712 `SettleAuthorization`** (returned in the quote's `signatureRequests`; the client fills `sourceTxHash` from the burn tx and passes the signature as `userSettleSig` to `POST /v1/transfers`). That signature is what makes the sponsored settle trustless: the sponsor can only execute the settle the user authorized, to the recipient the signature commits to. Steps 2 and 3 are sponsored — no user signatures on-chain, no user gas.
 
 ---
 
 ## Glossary
 
-**Asset.** One of `USDC`, `ETH`, `SOL`.
+**Asset.** One of `USDC`, `ETH`, `SOL`, `SPL` (any SPL mint, selected with `splAsset`), or `TOKEN` (generic Wormhole egress).
 
 **Direction.** `to-rome` (inbound, lands on a Rome chain) or `from-rome` (outbound, leaves a Rome chain).
 
-**Route.** A specific bridge mechanism for an `(asset, direction, sourceChain)` triple. There are eight; see [The eight routes](#the-eight-routes).
+**Route.** A specific bridge mechanism for an `(asset, direction, sourceChain)` triple. There are eleven; see [The route catalog](#the-route-catalog).
 
 **Step.** A single transaction in a route. Some routes have 1 step; some have 3. Each step has an `actor` — the entity that signs and broadcasts it.
 
