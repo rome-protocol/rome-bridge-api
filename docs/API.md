@@ -168,7 +168,7 @@ Returns the static route matrix.
 }
 ```
 
-`minAmount` and `maxAmount` are inclusive bounds in base units. The eight entries are the same as the [routes table above](#the-eight-routes).
+`minAmount` and `maxAmount` are inclusive bounds in base units. The entries are the same as the [routes table above](#the-route-catalog).
 
 ---
 
