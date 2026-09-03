@@ -2,6 +2,14 @@ name: ci
 on:
   pull_request: { branches: [main] }
   push: { branches: [main] }
+
+# Least privilege, pinned rather than inherited: without this the token gets
+# whatever the org/repo default grants, so a later default change would silently
+# widen this workflow. It only checks out and runs npm, so contents: read is all
+# it needs.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
