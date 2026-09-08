@@ -4,6 +4,7 @@ import { ROUTE_SPECS, assertAmountInRange } from "./route-keys.js";
 import { bridgeError } from "../errors.js";
 import { liveContractAddress } from "../registry/contracts.js";
 import type { Quote, QuoteInput, QuoteStep } from "./usdc-cctp-inbound.js";
+import { buildSplDelegateGrantTx } from "./spl-delegate-grant.js";
 
 // Rome→Solana SPL egress lives on RomeBridgeWithdraw (v6+), mint-explicit and
 // asset-agnostic: ONE contract bridges out ANY SPL by passing its mint.
@@ -49,7 +50,10 @@ export function buildSplSolanaOutboundQuote(input: QuoteInput): Quote {
   const steps: QuoteStep[] = [{
     n: 1, chain: `rome-${input.chain.chainId}`, kind: "spl-erc20-bridge-out",
     userSigns: true, sponsorPaysFees: false,
+    // v10: bridgeOutToSolana pulls the user's SPL as the user's delegate — the
+    // user's own approve_spl grant (to HelperProgram) is tx 0; bridge-out stays LAST.
     unsignedTxs: [
+      buildSplDelegateGrantTx({ bridge: withdraw, amount, mint: input.splAsset.mint, symbol: input.splAsset.symbol ?? "SPL" }),
       {
         to: withdraw,
         data: encodeFunctionData({ abi: BRIDGE_EGRESS_ABI, functionName: "ensureRecipientAta", args: [recipientBytes32, mintBytes32] }),

@@ -1,6 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { decodeFunctionData, parseAbi } from "viem";
+import { PublicKey } from "@solana/web3.js";
+import { bytesToHex, decodeFunctionData, getAddress, parseAbi } from "viem";
 import { buildEthWormholeOutboundQuote } from "../../src/route-builders/eth-wormhole-outbound";
+
+// v10: the user grants RomeBridgeWithdraw SPL-delegate rights with their own tx
+// to HelperProgram (approve_spl); burnETH then pulls as delegate. No contract-side
+// approveBurnETH exists any more.
+const HELPER_PROGRAM = "0xff00000000000000000000000000000000000009";
+const HELPER_ABI = parseAbi(["function approve_spl(address spender, uint64 amount, bytes32 mint)"]);
+const WETH_MINT_BYTES32 = bytesToHex(new PublicKey("6F5YWWrUMNpee8C6BDUc6DmRvYRMDDTgJHwKhbXuifWs").toBytes());
 
 // Live RomeBridgeWithdraw v6 on Hadrian (registry contracts.json). burnUSDC AND
 // burnETH live on the SAME v6 contract — so the Wormhole-out builder must resolve
@@ -61,7 +69,16 @@ describe("buildEthWormholeOutboundQuote", () => {
     expect(q.steps[0]?.chain).toMatch(/^rome-/);
     expect(q.steps[0]?.kind).toBe("wormhole-burn-eth");
     expect(q.steps[0]?.userSigns).toBe(true);
-    expect(q.steps[0]?.unsignedTxs).toHaveLength(2); // [approveBurnETH, burnETH]
+    expect(q.steps[0]?.unsignedTxs).toHaveLength(2); // [approve_spl grant, burnETH]
+    // Step-1 tx 0 = the user's delegate grant to HelperProgram, bound to the
+    // bridge, the 8-dec wrapper amount and the wETH mint.
+    const grant = q.steps[0]!.unsignedTxs![0]!;
+    expect(grant.to.toLowerCase()).toBe(HELPER_PROGRAM);
+    const g = decodeFunctionData({ abi: HELPER_ABI, data: grant.data });
+    expect(g.functionName).toBe("approve_spl");
+    expect(getAddress(g.args[0] as string)).toBe(getAddress(LIVE_WITHDRAW));
+    expect(g.args[1]).toBe(100000000n);
+    expect((g.args[2] as string).toLowerCase()).toBe(WETH_MINT_BYTES32.toLowerCase());
     expect(q.steps[1]?.chain).toBe("ethereum");
     expect(q.steps[1]?.kind).toBe("wormhole-claim-on-ethereum");
     expect(q.steps[1]?.blockedBy).toContain("step-1");
@@ -80,13 +97,13 @@ describe("buildEthWormholeOutboundQuote", () => {
     expect(claim.claimMethod).toBe("completeTransferAndUnwrapETH");
   });
 
-  it("resolves the burn target from the live RomeBridgeWithdraw contract", () => {
+  it("resolves the burn target from the live RomeBridgeWithdraw contract; the burn is the LAST tx", () => {
     const q = buildEthWormholeOutboundQuote({
       amount: "1000000000000000000", ...senderRecipient,
       chain: HADRIAN_CONFIG, programId: ROME_PROGRAM_ID,
     });
-    expect(q.steps[0]?.unsignedTxs?.[0]?.to?.toLowerCase()).toBe(LIVE_WITHDRAW);
-    expect(q.steps[0]?.unsignedTxs?.[1]?.to?.toLowerCase()).toBe(LIVE_WITHDRAW);
+    expect(q.steps[0]?.unsignedTxs?.[0]?.to?.toLowerCase()).toBe(HELPER_PROGRAM);
+    expect(q.steps[0]?.unsignedTxs?.at(-1)?.to?.toLowerCase()).toBe(LIVE_WITHDRAW);
   });
 
   it("throws when no live RomeBridgeWithdraw is published", () => {
@@ -110,14 +127,11 @@ describe("buildEthWormholeOutboundQuote", () => {
   // 8 dp; the wrapper mirrors the wrapped mint). Emitting wei into burnETH
   // calldata would burn 10^10× the intent.
   describe("wrapper-unit conversion", () => {
-    const ABI = parseAbi([
-      "function approveBurnETH(uint256 amount)",
-      "function burnETH(uint256 amount, address recipient)",
-    ]);
+    const ABI = parseAbi(["function burnETH(uint256 amount, address recipient)"]);
     const decodedAmounts = (q: ReturnType<typeof buildEthWormholeOutboundQuote>) => {
-      const approve = decodeFunctionData({ abi: ABI, data: q.steps[0]!.unsignedTxs![0]!.data as `0x${string}` });
+      const approve = decodeFunctionData({ abi: HELPER_ABI, data: q.steps[0]!.unsignedTxs![0]!.data as `0x${string}` });
       const burn = decodeFunctionData({ abi: ABI, data: q.steps[0]!.unsignedTxs![1]!.data as `0x${string}` });
-      return { approve: approve.args![0], burn: burn.args![0] };
+      return { approve: approve.args![1], burn: burn.args![0] };
     };
 
     it("encodes approve+burn amounts in 8-dec wrapper units, not wei (default when no asset row)", () => {

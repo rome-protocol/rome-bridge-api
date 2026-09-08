@@ -5,13 +5,13 @@ import { entryFor } from "../registry/catalog.js";
 import { resolveCanonicalWrapper } from "../chains/token-catalog.js";
 import { bridgeError } from "../errors.js";
 import type { Quote, QuoteInput, QuoteStep } from "./usdc-cctp-inbound.js";
+import { buildSplDelegateGrantTx } from "./spl-delegate-grant.js";
 
 // Generic Wormhole egress on RomeBridgeWithdraw (v7+): asset-agnostic + per-call
 // destination. Split across two EVM txs — approve then burn — because a single
 // atomic Rome DoTx with both CPIs exceeds Solana's 1.4M CU budget (same reason
 // as the ETH-specific approveBurnETH/burnETH pair).
 const WORMHOLE_GENERIC_ABI = parseAbi([
-  "function approveWormholeBurn(address assetWrapper, uint256 amount)",
   "function burnToWormhole(address assetWrapper, uint256 amount, bytes32 recipient, uint16 targetChain)",
 ]);
 
@@ -82,19 +82,20 @@ export function buildTokenWormholeOutboundQuote(input: QuoteInput): Quote {
   // VAA is signed. Without it the quote still works (portal redeem).
   const claimTokenBridge = entryFor(input.chain.bridge, input.destinationChainId)?.wormholeTokenBridge as `0x${string}` | undefined;
 
+  // v10: the bridge pulls the wrapper's underlying SPL as the user's delegate;
+  // the user's own approve_spl grant (to HelperProgram) is step-1 tx 0.
+  const grantMint = input.splAsset?.mint
+    ?? (input.chain.tokens ?? []).find((t) => t.address?.toLowerCase() === wrapper.toLowerCase())?.mintId;
+  if (!grantMint) throw bridgeError("rome.bridge.asset-not-supported", "cannot resolve the SPL mint behind the wrapper (splAsset.mint or a registry token row is required)");
+  const grantTx = buildSplDelegateGrantTx({ bridge: withdraw, amount, mint: grantMint, symbol: sym });
   const steps: QuoteStep[] = [
     {
-      // ONE step, two txs ([approve, burn] — CCTP-in shape): step1TxHash then
+      // ONE step, two txs ([grant, burn] — CCTP-in shape): step1TxHash then
       // binds the BURN (verifies the LAST unsignedTx), the tx the VAA
       // hangs off. Txs stay separate on-chain (the 1.4M-CU split is per-TX).
       n: 1, chain: `rome-${input.chain.chainId}`, kind: "wormhole-burn-token",
       userSigns: true, sponsorPaysFees: false,
-      unsignedTxs: [{
-        to: withdraw,
-        data: encodeFunctionData({ abi: WORMHOLE_GENERIC_ABI, functionName: "approveWormholeBurn", args: [wrapper, amount] }),
-        value: "0", estimatedGas: "1500000",
-        description: `Approve Wormhole burn of ${sym} on RomeBridgeWithdraw`,
-      }, {
+      unsignedTxs: [grantTx, {
         to: withdraw,
         data: encodeFunctionData({ abi: WORMHOLE_GENERIC_ABI, functionName: "burnToWormhole", args: [wrapper, amount, recipientBytes32, targetChain] }),
         value: "0", estimatedGas: "1500000",

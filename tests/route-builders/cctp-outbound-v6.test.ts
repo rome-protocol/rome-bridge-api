@@ -28,7 +28,7 @@ describe("registry contracts merge", () => {
 describe("outbound V2 quotes — per-call destination via the live v6 contract", () => {
   it("burn targets the registry-live RomeBridgeWithdraw with 3-arg calldata (Monad destination)", () => {
     const q = buildUsdcCctpOutboundQuote({ ...base, destinationChainId: 10143 });
-    const burn = q.steps[0]!.unsignedTxs![0]!;
+    const burn = q.steps[0]!.unsignedTxs!.at(-1)!; // v10: [approve_spl grant, burnUSDC]
     expect(burn.to).toBe("0x9975fe4b721bf52f2a5bcc795fa2e29edc50de8b");
     expect(burn.data.slice(0, 10)).toBe(V6_SELECTOR);
     const { args } = decodeFunctionData({ abi: V6_ABI, data: burn.data as `0x${string}` });
@@ -41,7 +41,7 @@ describe("outbound V2 quotes — per-call destination via the live v6 contract",
 
   it("destination omitted → the chain's default source entry (Sepolia, domain 0)", () => {
     const q = buildUsdcCctpOutboundQuote(base);
-    const { args } = decodeFunctionData({ abi: V6_ABI, data: q.steps[0]!.unsignedTxs![0]!.data as `0x${string}` });
+    const { args } = decodeFunctionData({ abi: V6_ABI, data: q.steps[0]!.unsignedTxs!.at(-1)!.data as `0x${string}` });
     expect(args[2]).toBe(0);
   });
 

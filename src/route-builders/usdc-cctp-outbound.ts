@@ -1,10 +1,11 @@
 import { encodeFunctionData, parseAbi } from "viem";
 import { ChainConfig } from "../registry/types.js";
 import { ROUTE_SPECS, assertAmountInRange } from "./route-keys.js";
-import { cctpDomainFor, entryFor, resolveCctpAddresses } from "../registry/catalog.js";
+import { assetFor, cctpDomainFor, entryFor, resolveCctpAddresses } from "../registry/catalog.js";
 import { liveContractAddress } from "../registry/contracts.js";
 import { bridgeError } from "../errors.js";
 import type { Quote, QuoteInput, QuoteStep } from "./usdc-cctp-inbound.js";
+import { buildSplDelegateGrantTx } from "./spl-delegate-grant.js";
 
 /**
  * Outbound (Rome → any catalog EVM chain) via RomeBridgeWithdraw v6: the
@@ -52,6 +53,15 @@ export function buildUsdcCctpOutboundQuote(input: QuoteInput): Quote {
   const burnToken = burnRow?.address;
   const burnTokenDecimals = burnRow?.decimals;
 
+  // v10: burnUSDC pulls the user's USDC SPL as the user's delegate; the user's
+  // own approve_spl grant (to HelperProgram) is step-1 tx 0. The mint is the
+  // USDC mint the wUSDC wrapper mirrors: the wrapper row, else the bridge
+  // catalog's USDC asset, else the gas mint (USDC-gas chains).
+  const usdcMint = burnRow?.mintId
+    ?? assetFor(input.chain.bridge, { symbol: "USDC" })?.solanaMint
+    ?? input.onchainGasMint ?? input.chain.gasToken?.mintId;
+  if (!usdcMint) throw bridgeError("rome.bridge.asset-not-supported", "no USDC Solana mint in the registry for this chain (tokens[spl_wrapper/usdc].mintId, bridge.assets[usdc].solanaMint or the gas mint)");
+  const grantTx = buildSplDelegateGrantTx({ bridge: withdraw, amount, mint: usdcMint, symbol: burnRow?.symbol ?? "wUSDC" });
   const burnData = encodeFunctionData({
     abi: ROME_BRIDGE_WITHDRAW_V6_ABI, functionName: "burnUSDC",
     args: [amount, input.recipient as `0x${string}`, destinationDomain],
@@ -61,7 +71,8 @@ export function buildUsdcCctpOutboundQuote(input: QuoteInput): Quote {
     {
       n: 1, chain: `rome-${input.chain.chainId}`, kind: "cctp-burn-usdc",
       userSigns: true, sponsorPaysFees: false,
-      unsignedTxs: [{
+      // [grant, burn]: registration binds the LAST tx (the burn).
+      unsignedTxs: [grantTx, {
         to: withdraw,
         data: burnData,
         value: "0",
