@@ -37,7 +37,7 @@ user already authorized on-chain. Per direction:
 | **Wormhole (ETH)** | `eth-wormhole-{to,from}-rome` | ETH | `wrapAndTransferETH` → guardian VAA → `complete_transfer_wrapped` (in); `burnETH` (out). |
 | **Solana-native (fixed)** | `usdc-solana-{to,from}-rome`, `sol-solana-{to,from}-rome` | USDC, SOL/wSOL | SPL `transferChecked` (in, native-wrap for SOL); gas-relative egress (out). |
 | **Solana SPL/LST (asset-agnostic)** | `spl-solana-{to,from}-rome` (asset `SPL`) | **any SPL/LST** | `transferChecked` in; mint-explicit `RomeBridgeWithdraw.bridgeOutToSolana(recipient,amount,mint)` out. Mint+decimals ride on `splAsset`. |
-| **Generic Wormhole egress (asset-agnostic)** | `token-wormhole-from-rome` (asset `TOKEN`) | **any wrapped asset** | `approveWormholeBurn` + `burnToWormhole(wrapper,amount,recipient,targetChain)` on RomeBridgeWithdraw; EVM→Wormhole chain-id map; VAA redeemed Wormhole-native. |
+| **Generic Wormhole egress (asset-agnostic)** | `token-wormhole-from-rome` (asset `TOKEN`) | **any wrapped asset** | user `approve_spl(bridge, amount, mint)` grant to HelperProgram, then `burnToWormhole(wrapper,amount,recipient,targetChain)` on RomeBridgeWithdraw (v10 pulls as the user's SPL delegate); EVM→Wormhole chain-id map; VAA redeemed Wormhole-native. |
 
 All contract addresses resolve at request time from the **registry** (`liveContractAddress(chain, "RomeBridgeWithdraw")`, `chain.contracts`/`tokens`/`bridge`). Nothing is hardcoded — the registry is the single source of truth.
 

@@ -4,6 +4,7 @@ import { ROUTE_SPECS, assertAmountInRange } from "./route-keys.js";
 import { bridgeError } from "../errors.js";
 import { liveContractAddress } from "../registry/contracts.js";
 import type { Quote, QuoteInput, QuoteStep } from "./usdc-cctp-inbound.js";
+import { buildSplDelegateGrantTx } from "./spl-delegate-grant.js";
 
 // wSOL mint is canonical and cluster-invariant.
 // https://spl.solana.com/token — the native-SOL wrapper.
@@ -68,7 +69,10 @@ export function buildSolSolanaOutboundQuote(input: QuoteInput): Quote {
         return [{
           n: 1, chain: `rome-${input.chain.chainId}`, kind: "spl-erc20-bridge-out",
           userSigns: true, sponsorPaysFees: false,
+          // v10: bridgeOutToSolana pulls the user's wSOL as the user's delegate —
+          // the user's own approve_spl grant (to HelperProgram) is tx 0; bridge-out stays LAST.
           unsignedTxs: [
+            buildSplDelegateGrantTx({ bridge: withdraw, amount, mint: WSOL_MINT, symbol: "wSOL" }),
             {
               to: withdraw,
               data: encodeFunctionData({ abi: BRIDGE_EGRESS_ABI, functionName: "ensureRecipientAta", args: [recipientBytes32, mintBytes32] }),

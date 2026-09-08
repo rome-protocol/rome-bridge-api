@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
+import { PublicKey } from "@solana/web3.js";
+import { bytesToHex, decodeFunctionData, getAddress, parseAbi } from "viem";
 import { buildUsdcCctpOutboundQuote } from "../../src/route-builders/usdc-cctp-outbound";
+import { liveContractAddress } from "../../src/registry/contracts";
+
+const HELPER_PROGRAM = "0xff00000000000000000000000000000000000009";
+const HELPER_ABI = parseAbi(["function approve_spl(address spender, uint64 amount, bytes32 mint)"]);
+const USDC_MINT_BYTES32 = bytesToHex(new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU").toBytes());
 import { loadFixtureChain } from "../helpers/chains";
 
 // v6 golden tests (calldata, per-destination domains, claim metadata) live in
@@ -22,7 +29,16 @@ describe("buildUsdcCctpOutboundQuote", () => {
     expect(q.steps).toHaveLength(2);
     expect(q.steps[0]?.chain).toBe("rome-200010");
     expect(q.steps[0]?.kind).toBe("cctp-burn-usdc");
-    expect(q.steps[0]?.unsignedTxs).toHaveLength(1);
+    // v10: [approve_spl grant → burnUSDC]; the burn stays LAST (registration binds it).
+    expect(q.steps[0]?.unsignedTxs).toHaveLength(2);
+    const grant = q.steps[0]!.unsignedTxs![0]!;
+    expect(grant.to.toLowerCase()).toBe(HELPER_PROGRAM);
+    const g = decodeFunctionData({ abi: HELPER_ABI, data: grant.data });
+    expect(g.functionName).toBe("approve_spl");
+    expect(getAddress(g.args[0] as string)).toBe(getAddress(liveContractAddress(HADRIAN, "RomeBridgeWithdraw")!));
+    expect(g.args[1]).toBe(100000000n);
+    expect((g.args[2] as string).toLowerCase()).toBe(USDC_MINT_BYTES32.toLowerCase());
+    expect(q.steps[0]!.unsignedTxs!.at(-1)!.to.toLowerCase()).toBe(liveContractAddress(HADRIAN, "RomeBridgeWithdraw")!.toLowerCase());
     expect(q.steps[1]?.chain).toBe("evm-11155111"); // default destination = the chain's default source entry
     expect(q.steps[1]?.kind).toBe("cctp-claim-on-destination");
     expect(q.steps[1]?.blockedBy).toContain("step-1");

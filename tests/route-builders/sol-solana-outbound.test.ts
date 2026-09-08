@@ -58,14 +58,22 @@ describe("buildSolSolanaOutboundQuote — on-chain gas-relative routing", () => 
       onchainGasMint: USDC_DEVNET_MINT, // gas is USDC → wSOL rides the wrapper egress
     });
     const txs = (q.steps[0] as any).unsignedTxs;
-    expect(txs.length).toBe(2);
-    // Egress is RomeBridgeWithdraw, NOT the ERC20-SPL wrapper (cached wrappers have no egress).
-    expect(txs.every((t: any) => t.to.toLowerCase() === ROME_BRIDGE_WITHDRAW.toLowerCase())).toBe(true);
-    const ensure = decodeFunctionData({ abi: BRIDGE_EGRESS_ABI, data: txs[0].data });
+    expect(txs.length).toBe(3);
+    // tx 0 = the user's SPL-delegate grant to HelperProgram (approve_spl), bound to
+    // the bridge + the wSOL mint; the egress txs target RomeBridgeWithdraw, NOT the
+    // ERC20-SPL wrapper (cached wrappers have no egress).
+    expect(txs[0].to.toLowerCase()).toBe("0xff00000000000000000000000000000000000009");
+    const grant = decodeFunctionData({ abi: parseAbi(["function approve_spl(address spender, uint64 amount, bytes32 mint)"]), data: txs[0].data });
+    expect(grant.functionName).toBe("approve_spl");
+    expect((grant.args[0] as string).toLowerCase()).toBe(ROME_BRIDGE_WITHDRAW.toLowerCase());
+    expect(grant.args[1]).toBe(1000000000n);
+    expect((grant.args[2] as string).toLowerCase()).toBe(WSOL_BYTES32.toLowerCase());
+    expect(txs.slice(1).every((t: any) => t.to.toLowerCase() === ROME_BRIDGE_WITHDRAW.toLowerCase())).toBe(true);
+    const ensure = decodeFunctionData({ abi: BRIDGE_EGRESS_ABI, data: txs[1].data });
     expect(ensure.functionName).toBe("ensureRecipientAta");
     expect((ensure.args[0] as string).toLowerCase()).toBe(RECIPIENT_BYTES32.toLowerCase());
     expect((ensure.args[1] as string).toLowerCase()).toBe(WSOL_BYTES32.toLowerCase()); // mint bound
-    const burn = decodeFunctionData({ abi: BRIDGE_EGRESS_ABI, data: txs[1].data });
+    const burn = decodeFunctionData({ abi: BRIDGE_EGRESS_ABI, data: txs[2].data });
     expect(burn.functionName).toBe("bridgeOutToSolana");
     expect((burn.args[0] as string).toLowerCase()).toBe(RECIPIENT_BYTES32.toLowerCase());
     expect(burn.args[1]).toBe(1000000000n);

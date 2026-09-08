@@ -38,7 +38,7 @@ describe("asset-agnostic SPL rail (mSOL)", () => {
     expect(ixs[1].programId).toBe("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
   });
 
-  it("outbound: RomeBridgeWithdraw 3-arg egress, mint bound, two-step", () => {
+  it("outbound: [approve_spl grant, ensureRecipientAta, bridgeOutToSolana], mint bound", () => {
     const q = buildSplSolanaOutboundQuote({
       ...base,
       sender: { rome: "0x1f4946Be340F06c46A50E65084790968aBcc48F6" },
@@ -47,13 +47,16 @@ describe("asset-agnostic SPL rail (mSOL)", () => {
     expect(q.route).toBe("spl-solana-from-rome");
     expect(q.steps[0]!.kind).toBe("spl-erc20-bridge-out");
     const txs = q.steps[0]!.unsignedTxs!;
-    expect(txs).toHaveLength(2);
-    // Both target the live RomeBridgeWithdraw, not a per-mint wrapper.
-    expect(txs[0]!.to.toLowerCase()).toBe("0x9975fe4b721bf52f2a5bcc795fa2e29edc50de8b");
+    expect(txs).toHaveLength(3);
+    // tx 0 = the user's SPL-delegate grant to HelperProgram (approve_spl=0xabf6f675),
+    // bound to the bridge + the mSOL mint; egress txs target RomeBridgeWithdraw.
+    expect(txs[0]!.to.toLowerCase()).toBe("0xff00000000000000000000000000000000000009");
+    expect(txs[0]!.data.slice(0, 10)).toBe("0xabf6f675");
     expect(txs[1]!.to.toLowerCase()).toBe("0x9975fe4b721bf52f2a5bcc795fa2e29edc50de8b");
-    // 3-arg selectors: ensureRecipientAta=0xeeaed29d, bridgeOutToSolana=0x8efe5df8.
-    expect(txs[0]!.data.slice(0, 10)).toBe("0xeeaed29d");
-    expect(txs[1]!.data.slice(0, 10)).toBe("0x8efe5df8");
+    expect(txs[2]!.to.toLowerCase()).toBe("0x9975fe4b721bf52f2a5bcc795fa2e29edc50de8b");
+    // 3-arg selectors: ensureRecipientAta=0xeeaed29d, bridgeOutToSolana=0x8efe5df8 (LAST).
+    expect(txs[1]!.data.slice(0, 10)).toBe("0xeeaed29d");
+    expect(txs[2]!.data.slice(0, 10)).toBe("0x8efe5df8");
   });
 
   it("rejects when splAsset.mint is absent (rail requires an explicit mint)", () => {

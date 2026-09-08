@@ -1,13 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { decodeFunctionData, parseAbi, pad, getAddress } from "viem";
+import { PublicKey } from "@solana/web3.js";
+import { bytesToHex, decodeFunctionData, parseAbi, pad, getAddress } from "viem";
 import { buildTokenWormholeOutboundQuote } from "../../src/route-builders/token-wormhole-outbound";
 import type { QuoteInput } from "../../src/route-builders/usdc-cctp-inbound";
 import { ROME_BRIDGE_WITHDRAW, syntheticChain } from "../helpers/chains";
 
 const ABI = parseAbi([
-  "function approveWormholeBurn(address assetWrapper, uint256 amount)",
   "function burnToWormhole(address assetWrapper, uint256 amount, bytes32 recipient, uint16 targetChain)",
 ]);
+// v10: step-1 tx 0 is the user's SPL-delegate grant to HelperProgram, not a
+// contract-side approveWormholeBurn (deleted).
+const HELPER_PROGRAM = "0xff00000000000000000000000000000000000009";
+const HELPER_ABI = parseAbi(["function approve_spl(address spender, uint64 amount, bytes32 mint)"]);
+const MSOL_MINT = "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So";
+const MSOL_BYTES32 = bytesToHex(new PublicKey(MSOL_MINT).toBytes());
 const WMSOL_WRAPPER = "0x1111111111111111111111111111111111111111";
 const SENDER = "0x1f4946Be340F06c46A50E65084790968aBcc48F6";
 const DEST_EVM = "0x00000000000000000000000000000000000000d1"; // recipient on the L2
@@ -23,17 +29,19 @@ const base = (destinationChainId?: number, wrapper?: string): QuoteInput => ({
 });
 
 describe("generic Wormhole egress (token-wormhole-from-rome)", () => {
-  it("emits [approveWormholeBurn, burnToWormhole, wormhole-claim] on RomeBridgeWithdraw, mint-agnostic", () => {
+  it("emits [approve_spl grant, burnToWormhole, wormhole-claim], mint-agnostic", () => {
     const q = buildTokenWormholeOutboundQuote(base(11155111, WMSOL_WRAPPER)); // Sepolia
     expect(q.route).toBe("token-wormhole-from-rome");
     expect(q.steps.map((s) => s.kind)).toEqual(["wormhole-burn-token", "wormhole-claim-on-destination"]);
-    // Both txs target the live RomeBridgeWithdraw (resolved from registry).
-    expect(q.steps[0]!.unsignedTxs![0]!.to.toLowerCase()).toBe(ROME_BRIDGE_WITHDRAW.toLowerCase());
+    // tx 0 = grant to HelperProgram; the burn (LAST tx) targets the live RomeBridgeWithdraw.
+    expect(q.steps[0]!.unsignedTxs![0]!.to.toLowerCase()).toBe(HELPER_PROGRAM);
     expect(q.steps[0]!.unsignedTxs![1]!.to.toLowerCase()).toBe(ROME_BRIDGE_WITHDRAW.toLowerCase());
-    // approve(wrapper, amount)
-    const approve = decodeFunctionData({ abi: ABI, data: q.steps[0]!.unsignedTxs![0]!.data });
-    expect(approve.functionName).toBe("approveWormholeBurn");
-    expect(getAddress(approve.args[0] as string)).toBe(getAddress(WMSOL_WRAPPER));
+    // approve_spl(bridge, amount, mint)
+    const approve = decodeFunctionData({ abi: HELPER_ABI, data: q.steps[0]!.unsignedTxs![0]!.data });
+    expect(approve.functionName).toBe("approve_spl");
+    expect(getAddress(approve.args[0] as string)).toBe(getAddress(ROME_BRIDGE_WITHDRAW));
+    expect(approve.args[1]).toBe(10_000_000n);
+    expect((approve.args[2] as string).toLowerCase()).toBe(MSOL_BYTES32.toLowerCase());
     // burn(wrapper, amount, recipient-bytes32, targetChain=Sepolia 10002)
     const burn = decodeFunctionData({ abi: ABI, data: q.steps[0]!.unsignedTxs![1]!.data });
     expect(burn.functionName).toBe("burnToWormhole");
@@ -64,8 +72,8 @@ describe("generic Wormhole egress (token-wormhole-from-rome)", () => {
       splAsset: { mint: MINT, decimals: 9, symbol: "wmSOL" }, // NO wrapper — resolved from the mint
     };
     const q = buildTokenWormholeOutboundQuote(input);
-    const approve = decodeFunctionData({ abi: ABI, data: q.steps[0]!.unsignedTxs![0]!.data });
-    expect(getAddress(approve.args[0] as string)).toBe(getAddress(RESOLVED));
+    const approve = decodeFunctionData({ abi: HELPER_ABI, data: q.steps[0]!.unsignedTxs![0]!.data });
+    expect((approve.args[2] as string).toLowerCase()).toBe(MSOL_BYTES32.toLowerCase()); // grant bound to the mint
     const burn = decodeFunctionData({ abi: ABI, data: q.steps[0]!.unsignedTxs![1]!.data });
     expect(getAddress(burn.args[0] as string)).toBe(getAddress(RESOLVED));
   });
