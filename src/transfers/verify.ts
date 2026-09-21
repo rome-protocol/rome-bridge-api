@@ -1,8 +1,10 @@
 import { QuoteStep, UnsignedEvmTx } from "../route-builders/usdc-cctp-inbound.js";
 import type { RecordStampT } from "./types.js";
+import { contractAtAddress } from "../registry/contracts.js";
+import type { ChainConfig } from "../registry/types.js";
 
 export interface OnchainEvmTx { to: string; data: string; value: string; }
-export interface VerifyResult { ok: boolean; reason?: string; }
+export interface VerifyResult { ok: boolean; reason?: string; warning?: string; }
 
 /** Canonical depositForBurn selectors per CCTP version. */
 const SELECTOR_BY_VERSION: Record<1 | 2, string> = {
@@ -19,7 +21,12 @@ const SELECTOR_BY_VERSION: Record<1 | 2, string> = {
  * stamp is frozen, never re-resolved). chainId is enforced by fetching the
  * tx via the record's own source-chain client, not by a field compare.
  */
-export function verifyEvmTxMatchesQuote(quotedStep: QuoteStep, tx: OnchainEvmTx, stamp?: RecordStampT): VerifyResult {
+export function verifyEvmTxMatchesQuote(
+  quotedStep: QuoteStep,
+  tx: OnchainEvmTx,
+  stamp?: RecordStampT,
+  chain?: Pick<ChainConfig, "contracts">,
+): VerifyResult {
   if (!quotedStep.unsignedTxs?.length) return { ok: false, reason: "step has no unsigned txs" };
   // Verify against the LAST element of unsignedTxs, not the first. CCTP inbound
   // emits [approve, depositForBurn] — the load-bearing tx is the deposit (carries
@@ -42,6 +49,34 @@ export function verifyEvmTxMatchesQuote(quotedStep: QuoteStep, tx: OnchainEvmTx,
   const allowedSelectors = stamp?.expectedSelectors ?? (stamp ? [SELECTOR_BY_VERSION[stamp.cctpVersion]] : undefined);
   if (allowedSelectors && !allowedSelectors.includes(actualSelector)) {
     return { ok: false, reason: `selector ${actualSelector} is not among the stamped burn selectors [${allowedSelectors.join(", ")}]` };
+  }
+
+  // Everything above proves the tx matches the QUOTE. For Rome-side egress
+  // that is not enough: the quote resolved RomeBridgeWithdraw by status when
+  // it was built, so a quote issued before a rotation still satisfies every
+  // check above after it — and the burn lands on a contract the registry has
+  // already moved off. Grade the target by its CURRENT status.
+  //
+  // Addresses the registry does not list are left ungraded on purpose: every
+  // inbound burn targets CCTP's TokenMessenger on a foreign chain, and
+  // treating unknown as bad would reject the entire inbound lane.
+  if (chain) {
+    const target = contractAtAddress(chain, tx.to);
+    if (target) {
+      const successor = target.liveAddress ? ` The live ${target.name} is ${target.liveAddress}.` : "";
+      if (target.status === "retired") {
+        return {
+          ok: false,
+          reason: `${target.name}${target.version ? ` ${target.version}` : ""} at ${tx.to} is retired in the registry — this quote predates a rotation.${successor}`,
+        };
+      }
+      if (target.status === "deprecated") {
+        return {
+          ok: true,
+          warning: `${target.name}${target.version ? ` ${target.version}` : ""} at ${tx.to} is deprecated in the registry; settle this transfer, but re-quote before issuing new ones.${successor}`,
+        };
+      }
+    }
   }
 
   return { ok: true };
