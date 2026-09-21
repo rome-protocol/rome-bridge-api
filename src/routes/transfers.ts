@@ -154,10 +154,21 @@ export async function transfersRoutes(app: FastifyInstance, _cfg: Config) {
     // reader → readTx(romeBurn) null → 400: no wormhole egress could register.
     let romeEntry: { chainId: number; rpcUrl?: string | undefined; name?: string | undefined } | undefined;
     let romeRpcForClaim: string | undefined;
-    if (!transport && q.direction === "from-rome" && q.route.includes("wormhole")) {
+
+    // EVERY from-rome route burns against a Rome contract (RomeBridgeWithdraw),
+    // so resolve that chain's registry entry once and hand it to verification.
+    // Hoisted out of the wormhole branch below: CCTP egress carries a resolved
+    // transport stamp and never entered it, which would have left the busiest
+    // egress lane ungraded.
+    let romeChainCfg: Awaited<ReturnType<typeof registry.listChains>>[number] | undefined;
+    if (q.direction === "from-rome") {
       const romeChainId = (quote.steps as Array<{ chain?: string }>)
         .map((s) => /^rome-(\d+)$/.exec(s.chain ?? "")?.[1]).find(Boolean);
-      const chain = romeChainId ? (await registry.listChains()).find((c) => c.chainId === romeChainId) : undefined;
+      romeChainCfg = romeChainId ? (await registry.listChains()).find((c) => c.chainId === romeChainId) : undefined;
+    }
+
+    if (!transport && q.direction === "from-rome" && q.route.includes("wormhole")) {
+      const chain = romeChainCfg;
       if (!chain?.rpcUrl) {
         const err = bridgeError("rome.bridge.asset-not-supported",
           "could not resolve the Rome chain for this from-rome quote (unknown chain or missing rpcUrl) — re-quote and retry");
@@ -179,12 +190,16 @@ export async function transfersRoutes(app: FastifyInstance, _cfg: Config) {
         reply.status(err.status);
         return { ...err };
       }
-      const result = verifyEvmTxMatchesQuote(quote.steps[0], onchain, transport?.stamp);
+      const result = verifyEvmTxMatchesQuote(quote.steps[0], onchain, transport?.stamp, romeChainCfg);
       if (!result.ok) {
         const err = bridgeError("rome.bridge.source-tx-mismatch", result.reason ?? "on-chain tx does not match quote");
         reply.status(err.status);
         return { ...err };
       }
+      // A deprecated egress target still settles, but silently accepting it is
+      // how a rotation goes unnoticed until the contract is retired and
+      // transfers start failing.
+      if (result.warning) app.log.warn({ tx: step1TxHash }, result.warning);
     } else if (reader) {
       const onchain = await reader.readTx(step1TxHash);
       if (!onchain) {
@@ -192,12 +207,16 @@ export async function transfersRoutes(app: FastifyInstance, _cfg: Config) {
         reply.status(err.status);
         return { ...err };
       }
-      const result = verifyEvmTxMatchesQuote(quote.steps[0], onchain, transport?.stamp);
+      const result = verifyEvmTxMatchesQuote(quote.steps[0], onchain, transport?.stamp, romeChainCfg);
       if (!result.ok) {
         const err = bridgeError("rome.bridge.source-tx-mismatch", result.reason ?? "on-chain tx does not match quote");
         reply.status(err.status);
         return { ...err };
       }
+      // A deprecated egress target still settles, but silently accepting it is
+      // how a rotation goes unnoticed until the contract is retired and
+      // transfers start failing.
+      if (result.warning) app.log.warn({ tx: step1TxHash }, result.warning);
     }
 
     const store = new TransferStore(app.redis);
