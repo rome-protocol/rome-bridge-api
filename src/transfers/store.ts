@@ -1,4 +1,14 @@
 import { randomUUID } from "node:crypto";
+import type { Redis } from "ioredis";
+import { TransferRecord, TransferRecordT, CreateInput, TransferStepT } from "./types.js";
+import { TransferEventLog } from "./events.js";
+import { transferOutcomeTotal } from "../observability/metrics.js";
+
+const RECORD_PREFIX    = "bridge:v1:transfer:";
+const KEY_RECORD       = (id: string) => `${RECORD_PREFIX}${id}`;
+const KEY_INDEX_STEP1  = (chain: string, txHash: string) => `bridge:v1:idx:step1:${chain}:${txHash.toLowerCase()}`;
+const KEY_INDEX_ADDR   = (addr: string) => `bridge:v1:idx:addr:${addr.toLowerCase()}`;
+const KEY_INDEX_IDEMP  = (key: string) => `bridge:v1:idx:idemp:${key}`;
 
 /**
  * Records created before the per-record stamp existed drain as V1 Sepolia —
@@ -16,22 +26,75 @@ export function backfillRecordDefaults(record: TransferRecordT, opts: { legacyIr
   if (out.settleDeadline === undefined) out.settleDeadline = null;
   return out;
 }
-import type { Redis } from "ioredis";
-import { TransferRecord, TransferRecordT, CreateInput, TransferStepT } from "./types.js";
-import { TransferEventLog } from "./events.js";
-import { transferOutcomeTotal } from "../observability/metrics.js";
 
-const RECORD_PREFIX    = "bridge:v1:transfer:";
-const KEY_RECORD       = (id: string) => `${RECORD_PREFIX}${id}`;
-const KEY_INDEX_STEP1  = (chain: string, txHash: string) => `bridge:v1:idx:step1:${chain}:${txHash.toLowerCase()}`;
-const KEY_INDEX_ADDR   = (addr: string) => `bridge:v1:idx:addr:${addr.toLowerCase()}`;
-const KEY_INDEX_IDEMP  = (key: string) => `bridge:v1:idx:idemp:${key}`;
+/** Atomic create: single Redis eval performs the natural-key probe, the
+ *  step-index reservation, the idempotency-key claim, the record persist and
+ *  the address-index writes with no interleaving, so two concurrent POST
+ *  /transfers sharing the same (step.chain, source-tx hash) can never both
+ *  persist (TOCTOU on the pre-checks). Status: "exists" (id), "created" or
+ *  "failed" (reason).
+ *
+ *  Redis/Lua reply-shape notes this script relies on:
+ *    - GET on an absent key returns Lua false, never nil — test truthiness.
+ *    - SET NX returns false on failure and +OK (Lua true) on success — never
+ *      the number 1 — so compare against false, not 1. */
+const ATOMIC_CREATE_LUA = `
+local stepKey = KEYS[1]
+local idemKey = KEYS[2]
+local recordKey = KEYS[3]
+local idemTTL = tonumber(ARGV[1])
+local idemKeyVal = ARGV[2]
+local recordJson = ARGV[3]
+local recordId = ARGV[4]
+local addrJson = ARGV[5]
+
+-- 1. Natural-key probe: (step.chain, source-tx hash) -> existing record.
+--    GET returns false (not nil) for an absent key, so test truthiness.
+local existing = redis.call("GET", stepKey)
+if existing then return { "exists", existing } end
+
+-- 2. Reserve the record slot first (NX on the step index). SET NX returns
+--    false on failure and +OK (Lua true) on success — never the number 1.
+if redis.call("SET", stepKey, recordId, "NX") == false then
+  return { "exists", redis.call("GET", stepKey) }
+end
+
+-- 3. Idempotency-key probe + claim (SET NX is the atomic claim), TTL 24h.
+--    Claimed after the natural-key reservation so a losing race releases the
+--    slot reserved above instead of leaking a pointer to a phantom record.
+if idemKeyVal ~= "" then
+  local e = redis.call("GET", idemKey)
+  if e then
+    redis.call("DEL", stepKey)
+    return { "exists", e }
+  end
+  redis.call("SET", idemKey, recordId, "NX", "EX", idemTTL)
+end
+
+-- 4. Persist the record. Check the SET reply (false on failure) directly —
+--    a follow-up GET can never observe an absent key as nil, so the old
+--    "GET == nil" guard was dead code that reported silent failures as created.
+if redis.call("SET", recordKey, recordJson, "NX") == false then
+  return { "failed", "record-write-failed" }
+end
+
+-- 5. Address index: SADD every recipient/sender address into its index set
+--    so GET /v1/transfers?address=... can find this record. Addresses arrive
+--    as a comma-joined string (they never contain commas) and are split with
+--    pure Lua so the script also runs under ioredis-mock's fengari VM, which
+--    does not embed cjson.
+for addr in string.gmatch(addrJson, "[^,]+") do
+  redis.call("SADD", "bridge:v1:idx:addr:" .. addr, recordId)
+end
+
+return { "created" }
+`;
 
 const IDEMPOTENCY_TTL_SECONDS = 24 * 60 * 60;   // 24h — matches spec window
 
 function collectAddresses(record: Pick<TransferRecordT, "recipient" | "sender">): string[] {
   const addrs = new Set<string>();
-  if (record.recipient)       addrs.add(record.recipient.toLowerCase());
+  if (record.recipient)        addrs.add(record.recipient.toLowerCase());
   if (record.sender.ethereum) addrs.add(record.sender.ethereum.toLowerCase());
   if (record.sender.solana)   addrs.add(record.sender.solana.toLowerCase());
   if (record.sender.rome)     addrs.add(record.sender.rome.toLowerCase());
@@ -47,10 +110,10 @@ export class TransferStore {
 
   /**
    * Create a transfer with two idempotency guarantees:
-   *   - Natural-key: existing record returned when (step.chain, step1TxHash)
-   *     matches a prior create (checked first; cheap + always present).
-   *   - Caller-supplied Idempotency-Key: existing record returned when the
-   *     same key arrives within IDEMPOTENCY_TTL_SECONDS (24h).
+   *    - Natural-key: existing record returned when (step.chain, step1TxHash)
+   *      matches a prior create (checked first; cheap + always present).
+   *    - Caller-supplied Idempotency-Key: existing record returned when the
+   *      same key arrives within IDEMPOTENCY_TTL_SECONDS (24h).
    */
   async create(input: CreateInput, idempotencyKey?: string): Promise<string> {
     const step1 = input.steps[0];
@@ -72,24 +135,31 @@ export class TransferStore {
     const now = new Date().toISOString();
     const record: TransferRecordT = { id, createdAt: now, updatedAt: now, completedAt: null, error: null, ...input };
 
-    await this.redis.set(KEY_RECORD(id), JSON.stringify(record));
+    // 3. Atomic check-and-set through one Redis eval (ATOMIC_CREATE_LUA)
+    const naturalKey = step1Hash
+      ? KEY_INDEX_STEP1(step1.chain, step1Hash)
+      : `bridge:v1:idx:nohash:${id}`;
+    const result = (await this.redis.eval(
+      ATOMIC_CREATE_LUA,
+      3,
+      naturalKey,
+      KEY_INDEX_IDEMP(idempotencyKey ?? ""),
+      KEY_RECORD(id),
+      IDEMPOTENCY_TTL_SECONDS,
+      idempotencyKey ?? "",
+      JSON.stringify(record),
+      id,
+      collectAddresses(record).join(","),
+    )) as [string, string?];
+    if (result[0] === "exists") return result[1] as string;
+    if (result[0] !== "created") {
+      throw new Error(`transfer create aborted (${result[0]}): ${JSON.stringify(result)}`);
+    }
+
     await this.events.append(id, "created", { outcome: record.outcome });
-    if (step1Hash) await this.redis.set(KEY_INDEX_STEP1(step1.chain, step1Hash), id);
-    for (const addr of collectAddresses(record)) {
-      await this.redis.sadd(KEY_INDEX_ADDR(addr), id);
-    }
-    if (idempotencyKey) {
-      await this.redis.set(KEY_INDEX_IDEMP(idempotencyKey), id, "EX", IDEMPOTENCY_TTL_SECONDS);
-    }
     return id;
   }
 
-  /**
-   * Return every transfer where the address appears as recipient OR as any of
-   * the per-chain sender entries (ethereum / solana / rome). Backed by a Redis
-   * SET written at create() time. O(n) on transfers per address, O(1) on
-   * total transfers in the store.
-   */
   async listByAddress(addr: string): Promise<TransferRecordT[]> {
     const ids = await this.redis.smembers(KEY_INDEX_ADDR(addr));
     const out: TransferRecordT[] = [];
@@ -100,12 +170,6 @@ export class TransferStore {
     return out;
   }
 
-  /**
-   * All transfer ids with outcome "pending" — drives the sponsor worker's
-   * tickOnce loop (the worker has no address, so listByAddress can't serve it).
-   * v1 scans record keys + hydrates, the same cost the attestation poller already
-   * pays (switch to a pending Redis SET if p99 crosses ~100ms at scale).
-   */
   async listPendingIds(): Promise<string[]> {
     const keys = await this.redis.keys(KEY_RECORD("*"));
     const out: string[] = [];
@@ -128,7 +192,6 @@ export class TransferStore {
     return this.get(id);
   }
 
-  /** One-time purge of the stored settle authorization after settle submits. */
   async purgeSettleMaterial(id: string): Promise<TransferRecordT | null> {
     const record = await this.get(id);
     if (!record) return null;
@@ -170,11 +233,6 @@ export class TransferStore {
     return record;
   }
 
-  /**
-   * Terminal liveness verdict (reaper-only): pending → expired + SSE event.
-   * NOT a funds verdict — the source burn stays claimable; recovery is
-   * re-registration/manual. No-op unless the record is still pending.
-   */
   async expire(id: string, reason: string): Promise<TransferRecordT | null> {
     const record = await this.get(id);
     if (!record || record.outcome !== "pending") return record;

@@ -1,5 +1,5 @@
 import Fastify, { FastifyBaseLogger } from "fastify";
-import fastifyCors from "@fastify/cors";
+import fastifyCors, { type FastifyCorsOptions } from "@fastify/cors";
 import { Config } from "./config.js";
 import { makeLogger } from "./observability/logger.js";
 import { httpRequestsTotal, httpRequestDurationSeconds, bridgeErrorsTotal, pollerKeysScanDurationSeconds, registry } from "./observability/metrics.js";
@@ -37,21 +37,25 @@ declare module "fastify" {
 export async function buildApp(cfg: Config) {
   const logger = makeLogger(cfg) as unknown as FastifyBaseLogger;
   const app = Fastify({ logger });
-  await app.register(fastifyCors, { origin: "*" });
+  
+  // CORS: configure allowed origins per deployment. Never use "*" on a bridge
+  // API — transfers, settle material and quotes are all readable cross-origin;
+  // default is deny (origin=false), enable via BRIDGE_CORS_ORIGINS.
+  const corsOrigins = (process.env.BRIDGE_CORS_ORIGINS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  const corsOptions: FastifyCorsOptions = corsOrigins.length > 0 ? { origin: corsOrigins } : { origin: false };
+
+  await app.register(fastifyCors, corsOptions);
 
   const limiter = new FixedWindowLimiter();
   app.addHook("onRequest", async (req, reply) => {
     (req as any)._startHrTime = process.hrtime.bigint();
 
-    // Support/debugging currency: echo the caller's id or mint one; accept
-    // inbound traceparent into the log context.
     const inboundId = req.headers["rome-request-id"];
     const requestId = (Array.isArray(inboundId) ? inboundId[0] : inboundId) ?? randomUUID();
     reply.header("Rome-Request-Id", requestId);
     const traceparent = req.headers["traceparent"];
     req.log = req.log.child({ requestId, ...(traceparent ? { traceparent } : {}) });
 
-    // Per-IP fixed-window budgets + IETF draft headers.
     if (req.url === "/metrics") return;
     const cls = classify(req.method, req.url);
     const state = limiter.hit(req.ip, cls);
@@ -64,6 +68,7 @@ export async function buildApp(cfg: Config) {
       await reply.status(429).send({ type: err.type, title: err.title, status: 429, detail: err.detail, code: err.code });
     }
   });
+
   app.addHook("onResponse", async (req, reply) => {
     const start = (req as any)._startHrTime as bigint | undefined;
     if (!start) return;
@@ -73,8 +78,8 @@ export async function buildApp(cfg: Config) {
     httpRequestsTotal.inc({ route, status: String(reply.statusCode) });
     httpRequestDurationSeconds.observe({ route }, durationSec);
   });
+
   app.addHook("onSend", async (_req, reply, payload) => {
-    // If the response is an RFC 9457 (ex-7807, same wire shape) bridge error, increment by code
     if (reply.statusCode >= 400 && reply.statusCode < 600 && typeof payload === "string") {
       try {
         const body = JSON.parse(payload);
@@ -103,14 +108,9 @@ export async function buildApp(cfg: Config) {
   app.decorate("redis", redis);
   app.addHook("onClose", async () => { await redis.quit(); });
 
-  // /v1/tokens factory long-tail: getLogs + Redis cache. Skipped in test env so
-  // route tests inject their own mock (mirrors the chainInventory pattern).
   if (cfg.env !== "test") {
     app.decorate("factoryTokensFor", makeFactoryTokensFor({ redis }));
 
-    // Background factory indexer — populates the tokencat:factory:<chainId> set
-    // that factoryTokensFor reads. Off the request path (Rome caps eth_getLogs at
-    // 12k blocks); one-time backfill from the registration slot, then incremental.
     const registryForIndexer = new RegistryClient({ source: { kind: "local", path: cfg.registryPath } });
     const factoryIndexer = makeFactoryIndexer({
       redis,
@@ -134,9 +134,6 @@ export async function buildApp(cfg: Config) {
   const circle = new CircleAttestationClient({ baseUrl: process.env.CIRCLE_IRIS_BASE_URL ?? "https://iris-api-sandbox.circle.com/v1" });
   const store = new TransferStore(redis);
 
-  // Wormhole inbound auto-advance — wired when env+config are present.
-  // Sepolia (Wormhole chain id 10002) Token Bridge: 0xDB5492265f6038831E89f495670FF909aDe94bd9
-  // Ethereum mainnet (chain id 2) Token Bridge:     0x3ee18B2214AFF97000D974cf647E54bfb53b8d51
   const isMainnet = process.env.ETHEREUM_NETWORK === "mainnet";
   const wormholeBaseUrl = process.env.WORMHOLESCAN_BASE_URL
     ?? (isMainnet ? "https://api.wormholescan.io" : "https://api.testnet.wormholescan.io");
@@ -148,27 +145,14 @@ export async function buildApp(cfg: Config) {
     wormholeChainId: isMainnet ? 2 : 10002,
   };
 
-  // Shared attestation-health object — decorated HERE, before the poller is
-  // constructed, and handed to it in BOTH branches. registerRoutes' decoration
-  // is hasDecorator-guarded, so this is the single instance every consumer
-  // (poller writes; /v1/health + /v1/routes read) shares. The prior ordering —
-  // decorate inside registerRoutes, construct the poller first — handed the
-  // poller `undefined`: vendor successes were never stamped, health ages read
-  // null forever, and route live-degradation could never fire.
   if (!app.hasDecorator("attestationHealth")) {
     app.decorate("attestationHealth", freshAttestationHealth());
   }
 
-  // txLogReader is lazily wired via the EthereumReader below (non-test envs).
-  // In tests the poller's Wormhole path stays no-op unless a stub is injected.
   let poller: AttestationPoller;
   if (cfg.env !== "test") {
     const rpcUrl = process.env.ETHEREUM_RPC_URL;
     if (!rpcUrl) {
-      // The reader verifies non-CCTP registrations; without the env it rides
-      // viem's PUBLIC default RPC (flaky/rate-limited → false
-      // source-tx-not-found). Loud at boot; ops provides it alongside
-      // EVM_RPC_URLS_JSON.
       app.log.warn("ETHEREUM_RPC_URL is unset — source-tx verification falls back to viem's public default RPC (flaky); set it from the paid-RPC map");
     }
     const ethReaderForPoller = new EthereumReader({
@@ -191,12 +175,8 @@ export async function buildApp(cfg: Config) {
   }
   app.decorate("attestationPoller", poller);
 
-  // tick every 5s in non-test envs
   if (cfg.env !== "test") {
     const interval = setInterval(async () => {
-      // Track the O(N) redis.keys scan latency. cheap at v1.0 volume,
-      // monitor at scale. p99 crossing ~100ms is the signal to switch to a
-      // pending-transfers Redis SET index.
       const stop = pollerKeysScanDurationSeconds.startTimer();
       const keys = await redis.keys("bridge:v1:transfer:*");
       stop();
@@ -207,9 +187,6 @@ export async function buildApp(cfg: Config) {
     }, 5_000);
     app.addHook("onClose", async () => clearInterval(interval));
 
-    // Terminal-failure reaper: sponsor-stalled pending records expire after
-    // MAX_PENDING_SECONDS (never user-paced claims) instead of retrying every
-    // 5s forever. Liveness verdict only — burns stay claimable on-chain.
     const maxPendingSeconds = Number(process.env.MAX_PENDING_SECONDS ?? 48 * 3600);
     const reaperInterval = setInterval(() => {
       reapExpired(store, { maxPendingSeconds, warn: (m) => app.log.warn(m) })
@@ -218,7 +195,6 @@ export async function buildApp(cfg: Config) {
     app.addHook("onClose", async () => clearInterval(reaperInterval));
   }
 
-  // Only wire real EthereumReader in non-test envs. Tests inject their own stub via app.decorate.
   if (cfg.env !== "test") {
     const rpcUrl = process.env.ETHEREUM_RPC_URL;
     const ethereumReader = new EthereumReader({
@@ -227,20 +203,11 @@ export async function buildApp(cfg: Config) {
     });
     app.decorate("ethereumReader", ethereumReader);
 
-    // Per-source EVM client pool (read-only). Catalog rpcUrl per entry;
-    // EVM_RPC_URLS_JSON overrides per chain id; the legacy ETHEREUM_RPC_URL
-    // env maps onto the configured default network's id.
     const overrides = parseRpcOverrides(process.env.EVM_RPC_URLS_JSON) ?? {};
     const legacyId = process.env.ETHEREUM_NETWORK === "mainnet" ? "1" : "11155111";
     if (rpcUrl && !overrides[legacyId]) overrides[legacyId] = rpcUrl;
     app.decorate("evmPool", new EvmClientPool({ rpcOverrides: overrides }));
 
-    // ChainInventory composes registry programs/index.json + on-chain OwnerInfo PDA reads.
-    // Tests inject a mocked inventory directly via app.decorate.
-    // Uses cfg.solanaRpcUrl (SOLANA_RPC_URL) — a dedicated Solana RPC endpoint.
-    // Fail-closed: with no RPC configured we DON'T wire it (every consumer
-    // guards on `app.chainInventory`) rather than fall back to the public
-    // devnet endpoint (rate-limited).
     if (cfg.solanaRpcUrl) {
       const { Connection } = await import("@solana/web3.js");
       const conn = new Connection(cfg.solanaRpcUrl, "confirmed");
@@ -250,8 +217,6 @@ export async function buildApp(cfg: Config) {
       });
       const chainInventory = new ChainInventory({ registry: registryClient, ownerInfo: ownerInfoClient });
       app.decorate("chainInventory", chainInventory);
-      // Reused by /v1/solana/* for same-origin blockhash reads by clients
-      // that can't reach a Solana RPC directly.
       app.decorate("solanaConnection", conn);
     }
   }
