@@ -11,6 +11,10 @@ writePublishedChain(dir, "200010-hadrian", {
   tokens: [
     { kind: "spl_wrapper", symbol: "wETH", decimals: 8, mintId: "MINT_ETH", address: "0xweth" },
     { kind: "gas", symbol: "USDC", decimals: 18, mintId: "MINT_USDC", address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
+    // the legacy SOL wrapper comes before the current one in the file, as in Hadrian's H14 tokens.json
+    { kind: "spl_wrapper", symbol: "SOL", decimals: 9, mintId: "MINT_SOL", address: "0xlegacysol", legacy: { replacedBy: "0xcurrentsol", note: "SOL (legacy)" } },
+    { kind: "spl_wrapper", symbol: "SOL", decimals: 9, mintId: "MINT_SOL", address: "0xcurrentsol" },
+    { kind: "spl_wrapper", symbol: "wSOL", decimals: 9, mintId: "MINT_SOL", address: "0xoldsol", legacy: { replacedBy: "0xlegacysol", note: "Rome SOL (legacy)" } },
   ],
 });
 
@@ -30,8 +34,15 @@ describe("GET /v1/tokens", () => {
     expect(byMint.MINT_ETH).toMatchObject({ verified: true, symbol: "wETH", wrappers: ["0xweth"] });
     expect(byMint.MINT_BSOL).toMatchObject({ verified: false, symbol: "bSOL", wrappers: ["0xbsol"] });
     expect(byMint.MINT_USDC).toBeUndefined(); // gas kind is native, not a catalog wrapper
-    // verified entries sort first
-    expect(body.tokens[0].mint).toBe("MINT_ETH");
+    // verified entries sort first, the factory long-tail last
+    expect(body.tokens.map((t: { verified: boolean }) => t.verified)).toEqual([true, true, false]);
+    expect(body.tokens[2].mint).toBe("MINT_BSOL");
+  });
+
+  it("lists the current SOL wrapper first and under its own symbol, the legacy ones after it", async () => {
+    const res = await app.inject({ method: "GET", url: "/v1/tokens?chainId=200010" });
+    const sol = res.json().tokens.find((t: { mint: string }) => t.mint === "MINT_SOL");
+    expect(sol).toMatchObject({ verified: true, symbol: "SOL", wrappers: ["0xcurrentsol", "0xlegacysol", "0xoldsol"] });
   });
 
   it("400s without chainId and for an unknown chain", async () => {

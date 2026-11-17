@@ -118,3 +118,55 @@ describe("resolveCanonicalWrapper — mint → registry-canonical wrapper (mint-
     expect(resolveCanonicalWrapper([], "MINT_ETH")).toBeUndefined();
   });
 });
+
+/**
+ * The Hadrian H14 tokens.json lists the legacy SOL wrapper (row 3) before the current one (row 4), then two older
+ * legacy SOL wrappers (rows 5, 6). The current wrapper must be the canonical one and name the token.
+ */
+const SOL_MINT = "So11111111111111111111111111111111111111112";
+const H14_SOL_ROWS = [
+  { kind: "gas", symbol: "USDC", decimals: 18, mintId: "MINT_USDC", address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
+  { kind: "spl_wrapper", symbol: "wUSDC", decimals: 6, mintId: "MINT_USDC", address: "0xbce339ba4c3a8de3bb8af1c5539e6ac11da3112d" },
+  { kind: "spl_wrapper", symbol: "SOL", decimals: 9, mintId: SOL_MINT, address: "0x2522d86592c431758ece4a76e147eb1cb20e9802", legacy: { replacedBy: "0x800b2965aac6efdcfca13f0c719307760b6780dc", note: "SOL (legacy)" } },
+  { kind: "spl_wrapper", symbol: "SOL", decimals: 9, mintId: SOL_MINT, address: "0x800b2965aac6efdcfca13f0c719307760b6780dc" },
+  { kind: "spl_wrapper", symbol: "roSOL", decimals: 9, mintId: SOL_MINT, address: "0xad72d881e883bf225a193d86550cccf6b529794b", legacy: { replacedBy: "0x2522d86592c431758ece4a76e147eb1cb20e9802", note: "roSOL (legacy)" } },
+  { kind: "spl_wrapper", symbol: "wSOL", decimals: 9, mintId: SOL_MINT, address: "0x39f36444fcb79b3e691544aee2a832ebef54ca9f", legacy: { replacedBy: "0xad72d881e883bf225a193d86550cccf6b529794b", note: "Rome SOL (legacy)" } },
+];
+
+describe("legacy wrappers never lead (Hadrian H14 shape)", () => {
+  it("the current SOL wrapper is first and names the token; the legacy ones follow in file order", () => {
+    const list = buildTokenList(H14_SOL_ROWS, []);
+    const sol = list.find((e) => e.mint === SOL_MINT)!;
+    expect(sol.wrappers).toEqual([
+      "0x800b2965aac6efdcfca13f0c719307760b6780dc",
+      "0x2522d86592c431758ece4a76e147eb1cb20e9802",
+      "0xad72d881e883bf225a193d86550cccf6b529794b",
+      "0x39f36444fcb79b3e691544aee2a832ebef54ca9f",
+    ]);
+    expect(sol).toMatchObject({ verified: true, symbol: "SOL", decimals: 9 });
+  });
+
+  it("Wormhole outbound resolves the current wrapper, in either row order", () => {
+    expect(resolveCanonicalWrapper(H14_SOL_ROWS, SOL_MINT)).toBe("0x800b2965aac6efdcfca13f0c719307760b6780dc");
+    expect(resolveCanonicalWrapper([...H14_SOL_ROWS].reverse(), SOL_MINT)).toBe("0x800b2965aac6efdcfca13f0c719307760b6780dc");
+  });
+
+  it("a mint with only a legacy wrapper keeps it, named by that row", () => {
+    const cat = buildTokenCatalog(
+      registryTokensToInputs([{ kind: "spl_wrapper", symbol: "wETH", decimals: 8, mintId: "MINT_ETH", address: "0xold", legacy: { replacedBy: "0xnew" } }]),
+      [],
+    );
+    expect(cat.get("MINT_ETH")).toMatchObject({ verified: true, symbol: "wETH", decimals: 8, wrappers: ["0xold"] });
+  });
+
+  it("a legacy row does not override the symbol of a current row that comes before it", () => {
+    const cat = buildTokenCatalog(
+      registryTokensToInputs([
+        { kind: "spl_wrapper", symbol: "SOL", decimals: 9, mintId: "M", address: "0xnew" },
+        { kind: "spl_wrapper", symbol: "wSOL", decimals: 9, mintId: "M", address: "0xold", legacy: { replacedBy: "0xnew" } },
+      ]),
+      [],
+    );
+    expect(cat.get("M")).toMatchObject({ symbol: "SOL", wrappers: ["0xnew", "0xold"] });
+  });
+});

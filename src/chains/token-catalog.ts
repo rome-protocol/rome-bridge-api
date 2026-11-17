@@ -8,6 +8,9 @@
  *   - on-chain ERC20SPL factory `TokenCreated` → unverified (permissionless long-tail)
  * A mint present in both is verified; its wrappers are unioned (registry-canonical
  * first), and its symbol/decimals come from the registry (the authoritative source).
+ * A registry row marked `legacy` (a wrapper since replaced) is listed after the current rows of its mint and
+ * never sets the symbol or decimals while a current row has them, so the current wrapper is the canonical one
+ * whatever the order of the rows in tokens.json.
  */
 
 export interface RegistryTokenInput {
@@ -15,6 +18,8 @@ export interface RegistryTokenInput {
   wrapper?: string;
   symbol?: string;
   decimals?: number;
+  /** A wrapper the registry marks as replaced: listed after the current ones, never canonical while a current one exists. */
+  legacy?: boolean;
 }
 
 export interface FactoryTokenInput {
@@ -42,6 +47,8 @@ export interface RegistryTokenEntry {
   address?: string | undefined;
   symbol?: string | undefined;
   decimals?: number | undefined;
+  /** Set (an object naming the replacement) on a wrapper the registry has replaced. */
+  legacy?: unknown;
 }
 
 // Kinds that represent a real ERC20-SPL wrapper over a mint. `gas` is excluded:
@@ -60,6 +67,7 @@ export function registryTokensToInputs(tokens: RegistryTokenEntry[]): RegistryTo
     if (t.address !== undefined) input.wrapper = t.address;
     if (t.symbol !== undefined) input.symbol = t.symbol;
     if (t.decimals !== undefined) input.decimals = t.decimals;
+    if (t.legacy) input.legacy = true;
     out.push(input);
   }
   return out;
@@ -120,11 +128,17 @@ export function buildTokenCatalog(
   };
 
   // Registry first: verified, canonical wrapper listed first, authoritative symbol/decimals.
-  for (const r of registry) {
+  // Current rows go before legacy rows, so a replaced wrapper is never canonical and never names the token.
+  for (const r of [...registry.filter((x) => !x.legacy), ...registry.filter((x) => x.legacy)]) {
     const e = ensure(r.mint);
     e.verified = true;
-    if (r.symbol !== undefined) e.symbol = r.symbol;
-    if (r.decimals !== undefined) e.decimals = r.decimals;
+    if (r.legacy) {
+      if (e.symbol === undefined && r.symbol !== undefined) e.symbol = r.symbol;
+      if (e.decimals === undefined && r.decimals !== undefined) e.decimals = r.decimals;
+    } else {
+      if (r.symbol !== undefined) e.symbol = r.symbol;
+      if (r.decimals !== undefined) e.decimals = r.decimals;
+    }
     addWrapper(r.mint, r.wrapper);
   }
 
